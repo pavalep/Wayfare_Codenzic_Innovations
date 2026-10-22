@@ -1,0 +1,1011 @@
+NAME: "React Native Assignment (Copy)"
+
+GLOBAL_VARS:
+fill_9318fa04:
+  - '#F3F5F7'
+style_839231e2:
+  fontFamily: Nunito Sans
+  fontStyle: Bold
+  fontWeight: 700
+  fontSize: 13
+  lineHeight: 19.5px
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+fill_55b3dffa:
+  - '#111F2C'
+fill_fcdb38dc:
+  - '#F1521F'
+fill_658ab2fa:
+  - '#FFFFFF'
+fill_d9daeb0b:
+  - '#7C8B99'
+style_c7973c3c:
+  fontFamily: Nunito Sans
+  fontStyle: Bold
+  fontWeight: 700
+  fontSize: 15
+  lineHeight: 22.5px
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+fill_8d0d66bc:
+  - '#A9B4BE'
+fill_1c71f841:
+  - '#E6EBEF'
+effect_12947aae:
+  boxShadow: 0px 1px 2px 0px rgba(17, 31, 44, 0.04)
+layout_177c5efc:
+  mode: none
+  sizing:
+    horizontal: hug
+    vertical: hug
+style_6eb38275:
+  fontFamily: Nunito Sans
+  fontStyle: SemiBold
+  fontWeight: 600
+  fontSize: 15
+  lineHeight: 22.5px
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+fill_fcbab780:
+  - '#9CA3AF'
+style_68b1dc5b:
+  fontFamily: Nunito Sans
+  fontStyle: Bold
+  fontWeight: 700
+  fontSize: 14
+  lineHeight: 21px
+  textAlignHorizontal: CENTER
+  textAlignVertical: TOP
+style_ce366d94:
+  fontFamily: Nunito Sans
+  fontStyle: ExtraBold
+  fontWeight: 800
+  fontSize: 17
+  lineHeight: 25.5px
+  textAlignHorizontal: CENTER
+  textAlignVertical: TOP
+style_1d9a3198:
+  fontFamily: Nunito Sans
+  fontStyle: Regular
+  fontWeight: 400
+  fontSize: 14
+  lineHeight: 21px
+  textAlignHorizontal: CENTER
+  textAlignVertical: TOP
+layout_cea18709:
+  mode: none
+  sizing: {}
+  locationRelativeToParent:
+    x: 0
+    y: 5
+  dimensions:
+    width: 38.02
+    height: 16
+style_9ae2dceb:
+  fontFamily: Nunito Sans
+  fontStyle: ExtraBold
+  fontWeight: 800
+  fontSize: 12
+  lineHeight: 18px
+  letterSpacing: 0.08em
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+layout_426ec1f5:
+  mode: none
+  sizing: {}
+  locationRelativeToParent:
+    x: 0
+    y: 5
+  dimensions:
+    width: 50.14
+    height: 16
+style_f5b4bcbd:
+  fontFamily: Nunito Sans
+  fontStyle: ExtraBold
+  fontWeight: 800
+  fontSize: 13
+  lineHeight: 19.5px
+  letterSpacing: 0.08em
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+style_88787f02:
+  fontFamily: Nunito Sans
+  fontStyle: Regular
+  fontWeight: 400
+  fontSize: 13
+  lineHeight: 19.5px
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+layout_a57bccad:
+  mode: none
+  sizing: {}
+  locationRelativeToParent:
+    x: 20
+    y: 17
+  dimensions:
+    width: 380
+    height: 56
+layout_c9a4c2b8:
+  mode: none
+  sizing: {}
+  locationRelativeToParent:
+    x: 170.75
+    y: 16.25
+  dimensions:
+    width: 38.48
+    height: 25.5
+fill_3ce5340e:
+  - '#F25424'
+effect_6a2d37fd:
+  boxShadow: 0px 8px 30px -12px rgba(23, 33, 47, 0.24)
+style_943d630f:
+  fontFamily: Nunito Sans
+  fontStyle: SemiBold
+  fontWeight: 600
+  fontSize: 14
+  lineHeight: 21px
+  textAlignHorizontal: RIGHT
+  textAlignVertical: TOP
+style_8fb452f3:
+  fontFamily: Nunito Sans
+  fontStyle: Bold
+  fontWeight: 700
+  fontSize: 15
+  lineHeight: 20.63px
+  textAlignHorizontal: LEFT
+  textAlignVertical: TOP
+layout_7ffcca2c:
+  mode: none
+  sizing: {}
+  locationRelativeToParent:
+    x: 0
+    y: 2
+  dimensions:
+    width: 38.31
+    height: 19.5
+layout_dc00e083:
+  mode: none
+  sizing: {}
+  locationRelativeToParent:
+    x: 0
+    y: 2
+  dimensions:
+    width: 40.7
+    height: 19.5
+
+ELEMENTS:
+EL-5d197b60:
+  type: FRAME
+  layout:
+    mode: row
+    alignItems: center
+    gap: 10px
+    sizing:
+      horizontal: hug
+      vertical: hug
+EL-9e561fc3:
+  type: FRAME
+  layout:
+    mode: none
+    sizing:
+      horizontal: fixed
+      vertical: fixed
+    dimensions:
+      width: 420
+      height: 880
+  fills: fill_9318fa04
+  effects:
+    boxShadow: 0px 0px 0px 0px rgba(255, 255, 255, 1), 0px 0px 0px 10px rgba(0, 0, 0, 0.6), 0px 25px 50px -12px rgba(0, 0, 0, 0.25)
+  borderRadius: 44px
+EL-3ff575ee:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 420
+      height: 35.5
+EL-da8af00f:
+  type: TEXT
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 28
+      y: 12
+    dimensions:
+      width: 26.62
+      height: 19.5
+  text: 9:41
+  textStyle: style_839231e2
+  fills: fill_55b3dffa
+EL-5c544f89:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 336
+      y: 13.75
+    dimensions:
+      width: 56
+      height: 16
+EL-80683827:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 35.5
+    dimensions:
+      width: 420
+      height: 844.5
+EL-66c41d1f:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 420
+      height: 844.5
+EL-167d47f7:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 32
+    dimensions:
+      width: 372
+      height: 54
+EL-f788cd91:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 16
+      y: 18
+    dimensions:
+      width: 18
+      height: 18
+EL-a6959adf:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 420
+      height: 88
+  fills: fill_658ab2fa
+  strokes: fill_1c71f841
+  strokeWeight: 0px 0px 1px
+EL-0b38b332:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 20
+      y: 8
+    dimensions:
+      width: 380
+      height: 59
+EL-62865e70:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: -8
+      y: 2
+    dimensions:
+      width: 40
+      height: 40
+  borderRadius: 12px
+EL-3ca440f3:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 40
+      y: 0
+    dimensions:
+      width: 257.41
+      height: 59
+EL-53128b7f:
+  type: TEXT
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 257.41
+      height: 32.5
+  text: Where are you going?
+  textStyle:
+    fontFamily: Nunito Sans
+    fontStyle: ExtraBold
+    fontWeight: 800
+    fontSize: 26
+    lineHeight: 32.5px
+    letterSpacing: '-0.025em'
+    textAlignHorizontal: LEFT
+    textAlignVertical: TOP
+  fills: fill_55b3dffa
+EL-f04428db:
+  type: TEXT
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 36.5
+    dimensions:
+      width: 244.18
+      height: 22.5
+  text: Step 1 of 2 · Set pickup and drop-off
+  textStyle:
+    fontFamily: Nunito Sans
+    fontStyle: Regular
+    fontWeight: 400
+    fontSize: 15
+    lineHeight: 22.5px
+    textAlignHorizontal: LEFT
+    textAlignVertical: TOP
+  fills: fill_d9daeb0b
+EL-841b6b5b:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 88
+    dimensions:
+      width: 420
+      height: 655.5
+EL-65ccd4cc:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 20
+      y: 20
+    dimensions:
+      width: 380
+      height: 187
+  fills: fill_658ab2fa
+  strokes: fill_1c71f841
+  strokeWeight: 1px
+  effects: effect_12947aae
+  borderRadius: 24px
+EL-65688ffc:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 17
+      y: 17
+    dimensions:
+      width: 10
+      height: 153
+EL-fea3ad2b:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 22
+    dimensions:
+      width: 10
+      height: 10
+  fills: fill_fcdb38dc
+  borderRadius: 9999px
+EL-3e103b45:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 4
+      y: 36
+    dimensions:
+      width: 2
+      height: 103
+  strokes: fill_1c71f841
+  strokeWeight: 0px 0px 0px 2px
+EL-5b428a3a:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 143
+    dimensions:
+      width: 10
+      height: 10
+  fills: fill_55b3dffa
+  borderRadius: 2px
+EL-cf7e0073:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 39
+      y: 17
+    dimensions:
+      width: 272
+      height: 153
+EL-1ea24728:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 272
+      height: 72
+EL-e3608787:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 6
+    dimensions:
+      width: 272
+      height: 60
+EL-ba3830ca:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 24
+    dimensions:
+      width: 272
+      height: 36
+EL-6850c9b0:
+  type: FRAME
+  layout:
+    mode: column
+    sizing:
+      horizontal: fixed
+      vertical: fixed
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 272
+      height: 36
+EL-e68881c5:
+  type: FRAME
+  layout:
+    mode: column
+    sizing:
+      horizontal: fixed
+      vertical: fixed
+    dimensions:
+      width: 272
+      height: 36
+EL-63a83d46:
+  type: TEXT
+  layout: layout_177c5efc
+  text: Choose a starting point
+  textStyle: style_c7973c3c
+  fills: fill_fcbab780
+EL-1ec99bd1:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 76
+    dimensions:
+      width: 272
+      height: 1
+  strokes: fill_1c71f841
+  strokeWeight: 1px 0px 0px
+EL-ef69f39e:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 81
+    dimensions:
+      width: 272
+      height: 72
+EL-bf3b5266:
+  type: TEXT
+  layout: layout_177c5efc
+  text: Choose a destination
+  textStyle: style_c7973c3c
+  fills: fill_fcbab780
+EL-f7042ed0:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 323
+      y: 39
+    dimensions:
+      width: 40
+      height: 40
+  fills: fill_9318fa04
+  borderRadius: 12px
+EL-f0b1c479:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 20
+      y: 223
+    dimensions:
+      width: 380
+      height: 51
+EL-27469b44:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 184
+      height: 51
+  fills: fill_658ab2fa
+  strokes: fill_1c71f841
+  strokeWeight: 1px
+  effects: effect_12947aae
+  borderRadius: 16px
+EL-f374feda:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 41.36
+      y: 16.5
+    dimensions:
+      width: 18
+      height: 18
+EL-34937537:
+  type: TEXT
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 67.36
+      y: 16
+    dimensions:
+      width: 75.27
+      height: 21
+  text: Use current
+  textStyle: style_68b1dc5b
+  fills: fill_55b3dffa
+EL-9dbaa872:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 196
+      y: 0
+    dimensions:
+      width: 184
+      height: 51
+  fills: fill_658ab2fa
+  strokes: fill_1c71f841
+  strokeWeight: 1px
+  effects: effect_12947aae
+  borderRadius: 16px
+EL-72d3ddfa:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 39.52
+      y: 16.5
+    dimensions:
+      width: 18
+      height: 18
+EL-979b1c38:
+  type: TEXT
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 65.52
+      y: 16
+    dimensions:
+      width: 78.96
+      height: 19
+  text: Pick on map
+  textStyle: style_68b1dc5b
+  fills: fill_55b3dffa
+EL-10d22c56:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 16
+      y: 16
+    dimensions:
+      width: 40
+      height: 40
+  fills: fill_9318fa04
+  borderRadius: 9999px
+EL-9337e44e:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 1
+    dimensions:
+      width: 378
+      height: 72
+EL-4e6a44f8:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 743.5
+    dimensions:
+      width: 420
+      height: 101
+  fills: fill_658ab2fa
+  strokes: fill_1c71f841
+  strokeWeight: 1px 0px 0px
+EL-e26791a3:
+  type: FRAME
+  layout:
+    mode: column
+    sizing:
+      horizontal: fixed
+      vertical: fixed
+    locationRelativeToParent:
+      x: 0
+      y: 0
+    dimensions:
+      width: 236
+      height: 36
+EL-ba7ab751:
+  type: FRAME
+  layout:
+    mode: column
+    sizing:
+      horizontal: fixed
+      vertical: fixed
+    dimensions:
+      width: 236
+      height: 36
+EL-09adc9ba:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 244
+      y: 4
+    dimensions:
+      width: 28
+      height: 28
+  fills: fill_9318fa04
+  borderRadius: 9999px
+EL-a5b41d96:
+  type: IMAGE-SVG
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 0
+      y: 15
+    dimensions:
+      width: 32
+      height: 32
+  fills: fill_9318fa04
+  borderRadius: 9999px
+EL-8a6afe37:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 44
+      y: 13
+    dimensions:
+      width: 283.3
+      height: 42.13
+EL-9abf1392:
+  type: FRAME
+  layout:
+    mode: none
+    sizing: {}
+    locationRelativeToParent:
+      x: 339.3
+      y: 13
+    dimensions:
+      width: 40.7
+      height: 21.5
+
+NODES:
+[CANVAS] "Page 1" #0:1
+  [FRAME] "Log in" #1:5 template=EL-5d197b60
+    [FRAME] "Background" #1:7 template=EL-9e561fc3
+      [FRAME] "Container" #1:8 template=EL-3ff575ee
+        [TEXT] #1:9 template=EL-da8af00f
+        [IMAGE-SVG] "Container" #1:10 template=EL-5c544f89
+      [FRAME] "Container" #1:27 template=EL-80683827
+        [FRAME] "Container" #1:28 template=EL-66c41d1f
+          [FRAME] "Container" #1:29 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":420,"height":706.5}}
+            [IMAGE-SVG] "Background" #1:30 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":40},"dimensions":{"width":56,"height":56}} fills=fill_fcdb38dc borderRadius=18px
+            [TEXT] #1:35 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":124},"dimensions":{"width":223.62,"height":36.8}} fills=fill_55b3dffa textStyle={"fontFamily":"Nunito Sans","fontStyle":"ExtraBold","fontWeight":800,"fontSize":32,"lineHeight":"36.8px","letterSpacing":"-0.025em","textAlignHorizontal":"LEFT","textAlignVertical":"TOP"} text="Welcome back"
+            [TEXT] #1:36 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":168.8},"dimensions":{"width":366.14,"height":24.38}} fills=fill_d9daeb0b textStyle={"fontFamily":"Nunito Sans","fontStyle":"Regular","fontWeight":400,"fontSize":15,"lineHeight":"24.38px","textAlignHorizontal":"LEFT","textAlignVertical":"TOP"} text="Log in to plan a trip and follow your route turn by turn."
+            [FRAME] "Container" #1:37 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":221.17},"dimensions":{"width":372,"height":188}}
+              [FRAME] "Label" #1:38 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":372,"height":86}}
+                [TEXT] #1:39 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":2},"dimensions":{"width":38.92,"height":20}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Email"
+                [FRAME] "Container" #1:40 template=EL-167d47f7
+                  [IMAGE-SVG] "SVG" #1:41 template=EL-f788cd91
+                  [FRAME] "Input" #1:44 layout={"mode":"column","padding":"0px 16px 0px 44px","sizing":{"horizontal":"fixed","vertical":"fixed"},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":372,"height":54}} fills=fill_658ab2fa strokes=fill_1c71f841 strokeWeight=1px effects=effect_12947aae borderRadius=16px
+                    [FRAME] "Container" #1:45 layout={"mode":"column","sizing":{"horizontal":"fixed","vertical":"fixed"},"dimensions":{"width":312,"height":54}}
+                      [TEXT] #1:46 layout=layout_177c5efc fills=fill_fcbab780 textStyle=style_6eb38275 text="you@example.com"
+              [FRAME] "Label" #1:47 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":102},"dimensions":{"width":372,"height":86}}
+                [TEXT] #1:48 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":2},"dimensions":{"width":68.19,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Password"
+                [FRAME] "Container" #1:49 template=EL-167d47f7
+                  [IMAGE-SVG] "SVG" #1:50 template=EL-f788cd91
+                  [FRAME] "Input" #1:53 layout={"mode":"column","padding":"0px 48px 0px 44px","sizing":{"horizontal":"fixed","vertical":"fixed"},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":372,"height":54}} fills=fill_658ab2fa strokes=fill_1c71f841 strokeWeight=1px effects=effect_12947aae borderRadius=16px
+                    [FRAME] "Container" #1:54 layout={"mode":"column","sizing":{"horizontal":"fixed","vertical":"fixed"},"dimensions":{"width":280,"height":54}}
+                      [TEXT] #1:55 layout=layout_177c5efc fills=fill_fcbab780 textStyle=style_6eb38275 text="Enter your password"
+                  [IMAGE-SVG] "Button" #1:56 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":324,"y":7},"dimensions":{"width":40,"height":40}} borderRadius=12px
+            [TEXT] #1:60 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":429.17},"dimensions":{"width":116.31,"height":21}} fills=fill_fcdb38dc textStyle=style_68b1dc5b text="Forgot password?"
+          [FRAME] "Background" #1:61 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":706.5},"dimensions":{"width":420,"height":138}} fills=fill_658ab2fa strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+            [FRAME] "Button" #1:62 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":17},"dimensions":{"width":372,"height":56}} fills=fill_fcdb38dc borderRadius=16px
+              [TEXT] #1:63 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":161.23,"y":16.25},"dimensions":{"width":49.53,"height":25.5}} fills=fill_658ab2fa textStyle=style_ce366d94 text="Log in"
+            [FRAME] "Paragraph" #1:64 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":24,"y":89},"dimensions":{"width":372,"height":21}}
+              [TEXT] #1:65 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":71.31,"y":1},"dimensions":{"width":109,"height":21}} fills=fill_d9daeb0b textStyle=style_1d9a3198 text="New to Wayfare?"
+              [TEXT] #1:66 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":183.92,"y":0},"dimensions":{"width":116.77,"height":21}} fills=fill_55b3dffa textStyle=style_68b1dc5b text="Create an account"
+  [FRAME] "Set locations" #1:67 template=EL-5d197b60
+    [FRAME] "Background" #1:69 template=EL-9e561fc3
+      [FRAME] "Container" #1:70 template=EL-3ff575ee
+        [TEXT] #1:71 template=EL-da8af00f
+        [IMAGE-SVG] "Container" #1:72 template=EL-5c544f89
+      [FRAME] "Container" #1:89 template=EL-80683827
+        [FRAME] "Container" #1:90 template=EL-66c41d1f
+          [FRAME] "Background" #1:91 template=EL-a6959adf
+            [FRAME] "Container" #1:92 template=EL-0b38b332
+              [IMAGE-SVG] "Button" #1:93 template=EL-62865e70
+              [FRAME] "Container" #1:96 template=EL-3ca440f3
+                [TEXT] #1:97 template=EL-53128b7f
+                [TEXT] #1:98 template=EL-f04428db
+          [FRAME] "Container" #1:99 template=EL-841b6b5b
+            [FRAME] "Background" #1:100 template=EL-65ccd4cc
+              [FRAME] "Container" #1:101 template=EL-65688ffc
+                [FRAME] "Background" #1:102 template=EL-fea3ad2b
+                [FRAME] "Container" #1:103 template=EL-3e103b45
+                [FRAME] "Background" #1:104 template=EL-5b428a3a
+              [FRAME] "Container" #1:105 template=EL-cf7e0073
+                [FRAME] "Container" #1:106 template=EL-1ea24728
+                  [FRAME] "Label" #1:107 template=EL-e3608787
+                    [TEXT] #1:108 layout=layout_cea18709 fills=fill_fcdb38dc textStyle=style_9ae2dceb text="Pickup"
+                    [FRAME] "Container" #1:109 template=EL-ba3830ca
+                      [FRAME] "Input" #1:110 template=EL-6850c9b0
+                        [FRAME] "Container" #1:111 template=EL-e68881c5
+                          [TEXT] #1:112 template=EL-63a83d46
+                [FRAME] "Container" #1:113 template=EL-1ec99bd1
+                [FRAME] "Container" #1:114 template=EL-ef69f39e
+                  [FRAME] "Label" #1:115 template=EL-e3608787
+                    [TEXT] #1:116 layout=layout_426ec1f5 fills=fill_8d0d66bc textStyle=style_9ae2dceb text="Drop-off"
+                    [FRAME] "Container" #1:117 template=EL-ba3830ca
+                      [FRAME] "Input" #1:118 template=EL-6850c9b0
+                        [FRAME] "Container" #1:119 template=EL-e68881c5
+                          [TEXT] #1:120 template=EL-bf3b5266
+              [IMAGE-SVG] "Button" #1:121 template=EL-f7042ed0
+            [FRAME] "Container" #1:127 template=EL-f0b1c479
+              [FRAME] "Button" #1:128 template=EL-27469b44
+                [IMAGE-SVG] "SVG" #1:129 template=EL-f374feda
+                [TEXT] #1:136 template=EL-34937537
+              [FRAME] "Button" #1:137 template=EL-9dbaa872
+                [IMAGE-SVG] "SVG" #1:138 template=EL-72d3ddfa
+                [TEXT] #1:142 template=EL-979b1c38
+            [TEXT] #1:143 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":302},"dimensions":{"width":82.07,"height":19.5}} fills=fill_8d0d66bc textStyle=style_f5b4bcbd text="Set as pickup"
+            [FRAME] "List" #1:144 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":333.5},"dimensions":{"width":380,"height":366}} fills=fill_658ab2fa strokes=fill_1c71f841 strokeWeight=1px effects=effect_12947aae borderRadius=24px
+              [FRAME] "ListItem" #1:145 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":1,"y":1},"dimensions":{"width":378,"height":72}}
+                [FRAME] "Button" #1:146 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":378,"height":72}}
+                  [IMAGE-SVG] "Background" #1:147 template=EL-10d22c56
+                  [FRAME] "Container" #1:151 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":70,"y":14},"dimensions":{"width":234.75,"height":44}}
+                    [TEXT] #1:152 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":41.52,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Home"
+                    [TEXT] #1:153 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":24.5},"dimensions":{"width":234.75,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Villa 12, Street 840, Zone 61 · West Bay"
+              [FRAME] "ListItem" #1:154 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":1,"y":73},"dimensions":{"width":378,"height":73}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                [FRAME] "Button" #1:155 template=EL-9337e44e
+                  [IMAGE-SVG] "Background" #1:156 template=EL-10d22c56
+                  [FRAME] "Container" #1:160 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":70,"y":14},"dimensions":{"width":219.92,"height":44}}
+                    [TEXT] #1:161 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":142.5,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Marina Office Tower"
+                    [TEXT] #1:162 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":24.5},"dimensions":{"width":219.92,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Level 14, Al Fardan Rd · Lusail Marina"
+              [FRAME] "ListItem" #1:163 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":1,"y":146},"dimensions":{"width":378,"height":73}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                [FRAME] "Button" #1:164 template=EL-9337e44e
+                  [IMAGE-SVG] "Background" #1:165 template=EL-10d22c56
+                  [FRAME] "Container" #1:169 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":70,"y":14},"dimensions":{"width":166.16,"height":44}}
+                    [TEXT] #1:170 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":166.16,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Corniche Ferry Terminal"
+                    [TEXT] #1:171 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":24.5},"dimensions":{"width":166.16,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Gate 3, Corniche Promenade"
+              [FRAME] "ListItem" #1:172 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":1,"y":219},"dimensions":{"width":378,"height":73}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                [FRAME] "Button" #1:173 template=EL-9337e44e
+                  [IMAGE-SVG] "Background" #1:174 template=EL-10d22c56
+                  [FRAME] "Container" #1:178 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":70,"y":14},"dimensions":{"width":203.98,"height":44}}
+                    [TEXT] #1:179 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":164.04,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Msheireb Metro Station"
+                    [TEXT] #1:180 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":24.5},"dimensions":{"width":203.98,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Al Kinana St · Msheireb Downtown"
+              [FRAME] "ListItem" #1:181 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":1,"y":292},"dimensions":{"width":378,"height":73}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                [FRAME] "Button" #1:182 template=EL-9337e44e
+                  [IMAGE-SVG] "Background" #1:183 template=EL-10d22c56
+                  [FRAME] "Container" #1:187 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":70,"y":14},"dimensions":{"width":198.48,"height":44}}
+                    [TEXT] #1:188 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":198.13,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Hamad International Airport"
+                    [TEXT] #1:189 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":24.5},"dimensions":{"width":134.46,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Terminal 1, Departures"
+          [FRAME] "Background" #1:190 template=EL-4e6a44f8
+            [FRAME] "Button" #1:191 layout=layout_a57bccad fills=fill_1c71f841 borderRadius=16px
+              [TEXT] #1:192 layout=layout_c9a4c2b8 fills=fill_8d0d66bc textStyle=style_ce366d94 text="Next"
+  [FRAME] "Trip ready" #1:193 template=EL-5d197b60
+    [FRAME] "Background" #1:195 template=EL-9e561fc3
+      [FRAME] "Container" #1:196 template=EL-3ff575ee
+        [TEXT] #1:197 template=EL-da8af00f
+        [IMAGE-SVG] "Container" #1:198 template=EL-5c544f89
+      [FRAME] "Container" #1:215 template=EL-80683827
+        [FRAME] "Container" #1:216 template=EL-66c41d1f
+          [FRAME] "Background" #1:217 template=EL-a6959adf
+            [FRAME] "Container" #1:218 template=EL-0b38b332
+              [IMAGE-SVG] "Button" #1:219 template=EL-62865e70
+              [FRAME] "Container" #1:222 template=EL-3ca440f3
+                [TEXT] #1:223 template=EL-53128b7f
+                [TEXT] #1:224 template=EL-f04428db
+          [FRAME] "Container" #1:225 template=EL-841b6b5b
+            [FRAME] "Background" #1:226 template=EL-65ccd4cc
+              [FRAME] "Container" #1:227 template=EL-65688ffc
+                [FRAME] "Background" #1:228 template=EL-fea3ad2b
+                [FRAME] "Container" #1:229 template=EL-3e103b45
+                [FRAME] "Background" #1:230 template=EL-5b428a3a
+              [FRAME] "Container" #1:231 template=EL-cf7e0073
+                [FRAME] "Container" #1:232 template=EL-1ea24728
+                  [FRAME] "Label" #1:233 template=EL-e3608787
+                    [TEXT] #1:234 layout=layout_cea18709 fills=fill_8d0d66bc textStyle=style_9ae2dceb text="Pickup"
+                    [FRAME] "Container" #1:235 template=EL-ba3830ca
+                      [FRAME] "Input" #1:236 template=EL-e26791a3
+                        [FRAME] "Container" #1:237 template=EL-ba7ab751
+                          [TEXT] #1:238 template=EL-63a83d46
+                      [IMAGE-SVG] "Button" #1:239 template=EL-09adc9ba
+                [FRAME] "Container" #1:243 template=EL-1ec99bd1
+                [FRAME] "Container" #1:244 template=EL-ef69f39e
+                  [FRAME] "Label" #1:245 template=EL-e3608787
+                    [TEXT] #1:246 layout=layout_426ec1f5 fills=fill_fcdb38dc textStyle=style_9ae2dceb text="Drop-off"
+                    [FRAME] "Container" #1:247 template=EL-ba3830ca
+                      [FRAME] "Input" #1:248 template=EL-e26791a3
+                        [FRAME] "Container" #1:249 template=EL-ba7ab751
+                          [TEXT] #1:250 template=EL-bf3b5266
+                      [IMAGE-SVG] "Button" #1:251 template=EL-09adc9ba
+              [IMAGE-SVG] "Button" #1:255 template=EL-f7042ed0
+            [FRAME] "Container" #1:261 template=EL-f0b1c479
+              [FRAME] "Button" #1:262 template=EL-27469b44
+                [IMAGE-SVG] "SVG" #1:263 template=EL-f374feda
+                [TEXT] #1:270 template=EL-34937537
+              [FRAME] "Button" #1:271 template=EL-9dbaa872
+                [IMAGE-SVG] "SVG" #1:272 template=EL-72d3ddfa
+                [TEXT] #1:276 template=EL-979b1c38
+            [TEXT] #1:277 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":302},"dimensions":{"width":93.77,"height":19.5}} fills=fill_8d0d66bc textStyle=style_f5b4bcbd text="Set as drop-off"
+            [FRAME] "Paragraph" #1:278 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":337.5},"dimensions":{"width":380,"height":90}} fills=fill_658ab2fa effects=effect_12947aae borderRadius=16px
+              [TEXT] #1:279 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":14,"y":25},"dimensions":{"width":353,"height":42}} fills=fill_d9daeb0b textStyle=style_1d9a3198 text="No saved places match that. Keep typing to use it as a custom address."
+          [FRAME] "Background" #1:280 template=EL-4e6a44f8
+            [FRAME] "Button" #1:281 layout=layout_a57bccad fills=fill_fcdb38dc borderRadius=16px
+              [TEXT] #1:282 layout=layout_c9a4c2b8 fills=fill_658ab2fa textStyle=style_ce366d94 text="Next"
+  [FRAME] "Route view" #1:283 template=EL-5d197b60
+    [FRAME] "Background" #1:285 template=EL-9e561fc3
+      [FRAME] "Container" #1:286 template=EL-3ff575ee
+        [TEXT] #1:287 template=EL-da8af00f
+        [IMAGE-SVG] "Container" #1:288 template=EL-5c544f89
+      [FRAME] "Container" #1:305 template=EL-80683827
+        [FRAME] "Container" #1:306 template=EL-66c41d1f
+          [FRAME] "Background" #1:307 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0.5},"dimensions":{"width":420,"height":340}} fills=["#E9E3D9"]
+            [FRAME] "Background" #1:1018 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":434,"height":327}} fills=["#F5F6F7"]
+              [RECTANGLE] "Image" #1:1019 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":-212,"y":0},"dimensions":{"width":858,"height":316}} fills=[{"type":"IMAGE","imageRef":"9498238325fa61ac33b6cd5f977d737117433d27","scaleMode":"FILL","objectFit":"cover","isBackground":false,"imageDownloadArguments":{"needsCropping":false,"requiresImageDimensions":false}}]
+              [IMAGE-SVG] #1:1033 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":41.5,"y":81.5},"dimensions":{"width":269,"height":85.31}} strokes=fill_3ce5340e strokeWeight=0.800000011920929px strokeDashes=2,2
+              [IMAGE-SVG] "Background" #1:1020 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":304,"y":75},"dimensions":{"width":32,"height":32}} fills=["#17212F"] strokes=fill_658ab2fa strokeWeight=2px effects=effect_6a2d37fd borderRadius=9999px
+              [IMAGE-SVG] "Background" #1:1024 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":5,"y":149},"dimensions":{"width":36,"height":36}} fills=fill_3ce5340e strokes=fill_658ab2fa strokeWeight=2px effects=effect_6a2d37fd borderRadius=9999px
+            [IMAGE-SVG] "Button" #1:352 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":16,"y":16},"dimensions":{"width":44,"height":44}} fills=fill_658ab2fa effects=effect_12947aae borderRadius=16px
+            [IMAGE-SVG] "Button" #1:355 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":360,"y":16},"dimensions":{"width":44,"height":44}} fills=fill_658ab2fa effects=effect_12947aae borderRadius=16px
+            [FRAME] "Background" #1:359 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":16,"y":253},"dimensions":{"width":228.19,"height":35.5}} fills=["rgba(17, 31, 44, 0.9)"] borderRadius=9999px
+              [IMAGE-SVG] "SVG" #1:360 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":14,"y":9.75},"dimensions":{"width":16,"height":16}}
+              [TEXT] #1:364 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":38,"y":8},"dimensions":{"width":176.19,"height":19.5}} fills=fill_658ab2fa textStyle=style_839231e2 text="Heavy traffic near the marina"
+          [FRAME] "Background" #1:365 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":311},"dimensions":{"width":420,"height":533.5}} fills=fill_658ab2fa effects={"boxShadow":"0px -12px 32px 0px rgba(17, 31, 44, 0.1)"} borderRadius="28px 28px 0px 0px"
+            [FRAME] "Background" #1:366 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":190,"y":10},"dimensions":{"width":40,"height":4}} fills=fill_1c71f841 borderRadius=9999px
+            [FRAME] "Container" #1:367 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":14},"dimensions":{"width":420,"height":235.5}}
+              [FRAME] "Container" #1:368 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":16},"dimensions":{"width":380,"height":57.5}}
+                [FRAME] "Container" #1:369 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":119.05,"height":57.5}}
+                  [TEXT] #1:370 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":81.77,"height":19.5}} fills=fill_8d0d66bc textStyle=style_f5b4bcbd text="Fastest route"
+                  [TEXT] #1:371 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":23.5},"dimensions":{"width":109.82,"height":34}} fills=fill_55b3dffa textStyle={"fontFamily":"Nunito Sans","fontStyle":"ExtraBold","fontWeight":800,"fontSize":34,"lineHeight":"34px","letterSpacing":"-0.025em","textAlignHorizontal":"LEFT","textAlignVertical":"TOP"} text="24 min"
+                [FRAME] "Paragraph" #1:372 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":244.86,"y":32.5},"dimensions":{"width":135.14,"height":25}}
+                  [TEXT] #1:373 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":1},"dimensions":{"width":43.15,"height":19}} fills=fill_d9daeb0b textStyle=style_943d630f text="9.6 km"
+                  [TEXT] #1:374 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":49.16,"y":1},"dimensions":{"width":3.32,"height":19}} fills=fill_8d0d66bc textStyle=style_943d630f text="·"
+                  [TEXT] #1:375 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":58.48,"y":1},"dimensions":{"width":36.16,"height":19}} fills=fill_d9daeb0b textStyle=style_943d630f text="arrive"
+                  [TEXT] #1:376 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":98.22,"y":1},"dimensions":{"width":36.92,"height":19}} fills=fill_d9daeb0b textStyle=style_943d630f text="10:42"
+              [FRAME] "Tablist" #1:377 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":89.5},"dimensions":{"width":380,"height":43}}
+                [FRAME] "Tab" #1:378 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":121.33,"height":43}} fills=["#FDEBE3"] strokes=fill_fcdb38dc strokeWeight=1px borderRadius=16px
+                  [TEXT] #1:379 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":43.38,"y":12},"dimensions":{"width":34.56,"height":21}} fills=["#D3410F"] textStyle=style_68b1dc5b text="Drive"
+                [FRAME] "Tab" #1:380 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":129.33,"y":0},"dimensions":{"width":121.34,"height":43}} fills=fill_658ab2fa strokes=fill_1c71f841 strokeWeight=1px borderRadius=16px
+                  [TEXT] #1:381 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":46.08,"y":12},"dimensions":{"width":29.16,"height":19}} fills=fill_55b3dffa textStyle=style_68b1dc5b text="Ride"
+                [FRAME] "Tab" #1:382 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":258.67,"y":0},"dimensions":{"width":121.33,"height":43}} fills=fill_658ab2fa strokes=fill_1c71f841 strokeWeight=1px borderRadius=16px
+                  [TEXT] #1:383 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":43.47,"y":12},"dimensions":{"width":34.38,"height":21}} fills=fill_55b3dffa textStyle=style_68b1dc5b text="Walk"
+              [FRAME] "Background" #1:384 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":148.5},"dimensions":{"width":380,"height":87}} fills=fill_9318fa04 borderRadius=16px
+                [FRAME] "Container" #1:385 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":16,"y":16},"dimensions":{"width":10,"height":55}}
+                  [FRAME] "Background" #1:386 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":6},"dimensions":{"width":10,"height":10}} fills=fill_fcdb38dc borderRadius=9999px
+                  [FRAME] "Container" #1:387 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":4,"y":20},"dimensions":{"width":2,"height":21}} strokes=["rgba(169, 180, 190, 0.6)"] strokeWeight="0px 0px 0px 2px"
+                  [FRAME] "Background" #1:388 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":45},"dimensions":{"width":10,"height":10}} fills=fill_55b3dffa borderRadius=2px
+                [FRAME] "Container" #1:389 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":38,"y":16},"dimensions":{"width":326,"height":55}}
+                  [TEXT] #1:390 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":189.63,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Home · Villa 12, Street 840"
+                  [TEXT] #1:391 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":32.5},"dimensions":{"width":313.35,"height":22.5}} fills=fill_55b3dffa textStyle=style_c7973c3c text="Marina Office Tower · Level 14, Al Fardan Rd"
+            [FRAME] "Container" #1:392 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":265.5},"dimensions":{"width":420,"height":168}}
+              [TEXT] #1:393 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":0},"dimensions":{"width":77.08,"height":19.5}} fills=fill_8d0d66bc textStyle=style_f5b4bcbd text="Turn by turn"
+              [FRAME] "List" #1:394 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":27.5},"dimensions":{"width":380,"height":267.5}}
+                [FRAME] "ListItem" #1:395 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":380,"height":66.13}}
+                  [IMAGE-SVG] "Background" #1:396 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":14},"dimensions":{"width":32,"height":32}} fills=fill_9318fa04 borderRadius=9999px
+                  [FRAME] "Container" #1:400 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":44,"y":12},"dimensions":{"width":285.69,"height":42.13}}
+                    [TEXT] #1:401 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":178.5,"height":20.63}} fills=fill_55b3dffa textStyle=style_8fb452f3 text="Head north on Street 840"
+                    [TEXT] #1:402 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":22.63},"dimensions":{"width":184.4,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Keep right past the service road"
+                  [FRAME] "Container" #1:403 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":341.69,"y":12},"dimensions":{"width":38.31,"height":21.5}}
+                    [TEXT] #1:404 layout=layout_7ffcca2c fills=fill_d9daeb0b textStyle=style_839231e2 text="450 m"
+                [FRAME] "ListItem" #1:405 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":66.13},"dimensions":{"width":380,"height":67.13}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                  [IMAGE-SVG] "Background" #1:406 template=EL-a5b41d96
+                  [FRAME] "Container" #1:410 template=EL-8a6afe37
+                    [TEXT] #1:411 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":197.09,"height":20.63}} fills=fill_55b3dffa textStyle=style_8fb452f3 text="Turn right onto Al Istiqlal St"
+                    [TEXT] #1:412 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":22.62},"dimensions":{"width":215.37,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Moderate traffic near the roundabout"
+                  [FRAME] "Container" #1:413 template=EL-9abf1392
+                    [TEXT] #1:414 layout=layout_dc00e083 fills=fill_d9daeb0b textStyle=style_839231e2 text="1.8 km"
+                [FRAME] "ListItem" #1:415 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":133.25},"dimensions":{"width":380,"height":67.13}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                  [IMAGE-SVG] "Background" #1:416 template=EL-a5b41d96
+                  [FRAME] "Container" #1:420 template=EL-8a6afe37
+                    [TEXT] #1:421 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":231.68,"height":20.63}} fills=fill_55b3dffa textStyle=style_8fb452f3 text="Continue onto Lusail Expressway"
+                    [TEXT] #1:422 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":22.63},"dimensions":{"width":145.72,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Stay in the two left lanes"
+                  [FRAME] "Container" #1:423 template=EL-9abf1392
+                    [TEXT] #1:424 layout=layout_dc00e083 fills=fill_d9daeb0b textStyle=style_839231e2 text="6.4 km"
+                [FRAME] "ListItem" #1:425 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":200.38},"dimensions":{"width":380,"height":67.13}} strokes=fill_1c71f841 strokeWeight="1px 0px 0px"
+                  [IMAGE-SVG] "Background" #1:426 template=EL-a5b41d96
+                  [FRAME] "Container" #1:430 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":44,"y":13},"dimensions":{"width":285.69,"height":42.13}}
+                    [TEXT] #1:431 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":0},"dimensions":{"width":216.76,"height":20.63}} fills=fill_55b3dffa textStyle=style_8fb452f3 text="Exit toward Marina Promenade"
+                    [TEXT] #1:432 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":22.62},"dimensions":{"width":187.37,"height":19.5}} fills=fill_d9daeb0b textStyle=style_88787f02 text="Destination will be on your right"
+                  [FRAME] "Container" #1:433 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":341.69,"y":13},"dimensions":{"width":38.31,"height":21.5}}
+                    [TEXT] #1:434 layout=layout_7ffcca2c fills=fill_d9daeb0b textStyle=style_839231e2 text="900 m"
+            [FRAME] "Container" #1:435 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":0,"y":433.5},"dimensions":{"width":420,"height":100}}
+              [FRAME] "Button" #1:436 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":20,"y":16},"dimensions":{"width":380,"height":56}} fills=fill_fcdb38dc borderRadius=16px
+                [IMAGE-SVG] "SVG" #1:437 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":110.58,"y":18},"dimensions":{"width":20,"height":20}}
+                [TEXT] #1:439 layout={"mode":"none","sizing":{},"locationRelativeToParent":{"x":138.58,"y":16.25},"dimensions":{"width":130.53,"height":23}} fills=fill_658ab2fa textStyle=style_ce366d94 text="Start navigation"
