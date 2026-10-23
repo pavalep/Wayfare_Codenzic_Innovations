@@ -16,6 +16,7 @@
  *   npm run build:apk              debug APK
  *   npm run build:apk -- --release release APK
  *   npm run build:apk -- --no-prebuild   reuse the existing android/
+ *   npm run build:apk -- --release --no-prebuild --abis=arm64-v8a,x86_64
  *
  * The Google Maps API key is read from `.env` by `app.config.ts`
  * DURING the prebuild step, so `.env` must exist before this script
