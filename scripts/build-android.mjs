@@ -53,6 +53,26 @@ const variant = args.includes('--release') ? 'release' : 'debug';
 const skipPrebuild = args.includes('--no-prebuild');
 
 /**
+ * The ABIs to build for.
+ *
+ * `--abis=arm64-v8a,x86_64` (the default) keeps the APK small and, more
+ * importantly, keeps the build fast: Gradle only compiles the native code
+ * for the ABIs it is asked for, and the CMake cache in `android/app/.cxx/`
+ * already holds the output for these two. Asking for all four means a
+ * fresh native compile for `armeabi-v7a` and `x86`, which adds roughly
+ * half an hour to the build.
+ *
+ * `arm64-v8a` covers every phone made in the last several years and
+ * `x86_64` covers emulators and Chromebooks, which together are what a
+ * test hand-out needs. Pass `--abis=armeabi-v7a,arm64-v8a,x86,x86_64`
+ * for a Play Store style universal binary.
+ */
+const abisArg = args.find(argument => argument.startsWith('--abis='));
+const abis = abisArg
+  ? abisArg.slice('--abis='.length).split(',').map(value => value.trim()).filter(Boolean)
+  : ['arm64-v8a', 'x86_64'];
+
+/**
  * Reads `.env` into an object.
  *
  * A deliberately small parser: the file is a flat list of
