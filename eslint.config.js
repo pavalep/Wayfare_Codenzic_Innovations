@@ -102,4 +102,21 @@ module.exports = defineConfig([
       },
     },
   },
+  {
+    // The build scripts run in NODE, not in a browser or in React
+    // Native, so they get Node's globals.
+    //
+    // `Buffer` is the one that matters: sharp's input has to be a
+    // Buffer, and there is no browser-shaped way to make one.
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        Buffer: 'readonly',
+        process: 'readonly',
+        console: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
+    },
+  },
 ]);

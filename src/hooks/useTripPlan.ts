@@ -10,9 +10,9 @@ import type {Place, TravelMode} from '../types';
  * `trip.pickup` instead of calling four different selectors, and so
  * the set of mutations a screen can perform is explicit.
  *
- * The store itself is the single source of truth — it is persisted,
- * so a cold start lands the user back on the screen they left with
- * their trip intact.
+ * The store itself is the single source of truth. It is not
+ * persisted — a trip is work in progress, and it starts empty on
+ * every launch (see `src/state/tripStore.ts`).
  */
 export function useTripPlan() {
   const pickup = useTripStore(state => state.pickup);

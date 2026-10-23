@@ -252,20 +252,57 @@ const styles = StyleSheet.create({
   rail: {
     width: 10,
     marginLeft: spacing.lg,
+    /*
+     * The rail fills the card's height rather than having a height
+     * of its own.
+     *
+     * The Figma's rail is a fixed 153 px tall container with the
+     * destination square at its very bottom, and the card's own
+     * content is laid out to meet it — the square's bottom edge is
+     * the bottom edge of the card's content, level with the last
+     * line of the drop-off value.
+     *
+     * A fixed-height rail cannot do that here, because this card's
+     * height comes from its text: the values are the user's own
+     * places, and they are not the Figma's placeholders, so they do
+     * not occupy the Figma's 153 px. A rail with a fixed height
+     * would therefore push the square below the text — or leave it
+     * floating in the middle of the card, depending on how long the
+     * place names were.
+     *
+     * So the rail stretches with the card and the square lands on
+     * the bottom of the content, exactly as the design has it.
+     */
+    alignSelf: 'stretch',
   },
   railTop: {
     alignItems: 'center',
+    flex: 1,
   },
   dotOrigin: {
     width: 10,
     height: 10,
     borderRadius: radius.pill,
     backgroundColor: colors.brand.primary,
-    marginTop: 5,
+    /*
+     * The dot is centred on the BASELINE of the "Pickup" eyebrow.
+     *
+     * The Figma puts the dot 22 px below the top of the card's
+     * content, which is where the eyebrow's descenders end. The
+     * eyebrow here is a 12 px line in an 18 px line box starting
+     * 5 px into the field, so its ink ends 15 px below the top of
+     * the card's content — and the dot's centre has to be there.
+     */
+    marginTop: 15,
   },
   connector: {
     width: 2,
-    height: 103,
+    /*
+     * The connector fills the gap between the dot and the square
+     * instead of having a length of its own, so it always reaches
+     * both of them.
+     */
+    flex: 1,
     marginTop: 4,
     backgroundColor: colors.border.subtle,
   },
@@ -274,7 +311,12 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 2,
     backgroundColor: colors.marker.destination,
-    marginTop: 11,
+    /*
+     * The 4 px gap between the connector and the square is the
+     * Figma's own (`0px 0px 0px 2px` stroke on the connector ends
+     * 4 px above the square).
+     */
+    marginTop: 4,
   },
   fields: {
     flex: 1,

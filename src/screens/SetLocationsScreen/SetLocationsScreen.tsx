@@ -1,11 +1,22 @@
-import React, {useMemo, useState} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {useFocusEffect, usePreventRemove} from 'expo-router';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  Alert,
+  BackHandler,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {STRINGS} from '../../constants';
 import {createCustomPlace, searchSavedPlaces} from '../../data/places';
+import {isInsideServiceArea, SERVICE_AREA_REGION} from '../../data/serviceArea';
 import {useCurrentLocation} from '../../hooks/useCurrentLocation';
+import {useLiveMapEnabled} from '../../hooks/useLiveMapEnabled';
 import {useTripPlan} from '../../hooks/useTripPlan';
 import {useAppRouter} from '../../navigation';
+import {useAuthStore} from '../../state';
 import {colors, shadows, spacing} from '../../theme';
 import type {Place} from '../../types';
 import {
@@ -13,6 +24,7 @@ import {
   isTripComplete,
   type LocationTarget,
 } from '../../utils/tripFlow';
+import {AppFooter} from '../../components/core/AppFooter';
 import {AppButton} from '../../components/core/AppButton';
 import {AppCard} from '../../components/core/AppCard';
 import {AppScreen} from '../../components/core/AppScreen';
@@ -60,13 +72,25 @@ import {RouteMap} from '../../components/map/RouteMap';
  *
  * "Next" is enabled only when BOTH ends are chosen.
  *
- * "Pick on map" swaps the body for the live map: tapping it drops a
- * pin, and the confirm button takes that point as the end currently
- * being edited. The Figma has no frame for that flow, so it reuses
- * the route screen's map rather than inventing a fifth screen.
+ * LEAVING THE SCREEN ENDS THE SESSION
+ *
+ * This screen sits inside the signed-in guard, so the back control is
+ * the app's only way out of a session that the user has started. It
+ * does not just navigate away — it asks first, and signing out is
+ * what confirming does.
+ *
+ * Both ways out are covered: the header chevron, and the Android
+ * hardware back button. The hardware button is intercepted with
+ * React Native's own `BackHandler`, which is the documented API for
+ * it — returning `true` there stops the press before the navigator
+ * sees it, so the screen does not pop behind the alert. The
+ * navigator is covered as well with `usePreventRemove`, so no other
+ * navigation action can remove the screen either.
  */
 const SetLocationsScreen: React.FC = () => {
   const {goToLogin, goToTripReady} = useAppRouter();
+  const signOut = useAuthStore(state => state.signOut);
+  const liveMapEnabled = useLiveMapEnabled();
   const {
     pickup,
     dropoff,
@@ -77,6 +101,17 @@ const SetLocationsScreen: React.FC = () => {
     swapTripEnds,
   } = useTripPlan();
   const {locate, isLocating} = useCurrentLocation();
+
+  /**
+   * The bottom safe-area inset.
+   *
+   * The screen does not ask `AppScreen` for the bottom edge, because
+   * the white footer owns that inset — otherwise the strip under the
+   * footer would be painted in the canvas grey and the footer would
+   * look cut off. The map mode has its own grey bar over the map, and
+   * it needs the same inset so its button clears the gesture bar.
+   */
+  const insets = useSafeAreaInsets();
 
   /**
    * Which end of the trip the user has chosen to edit.
@@ -94,6 +129,132 @@ const SetLocationsScreen: React.FC = () => {
   const [isPickingOnMap, setIsPickingOnMap] = useState(false);
   const [mapPick, setMapPick] = useState<Place | null>(null);
   const [query, setQuery] = useState('');
+
+  /**
+   * Whether the sign-out alert is already on screen.
+   *
+   * The header chevron, the hardware back button and the navigator
+   * can all ask to leave, and two of them can fire for one press. The
+   * flag keeps one press to one alert — a second alert would stack on
+   * top of the first.
+   */
+  const isAskingToLeave = useRef(false);
+
+  /**
+   * The navigator's own removal switch.
+   *
+   * `usePreventRemove` has to be switched off in the SAME tick as the
+   * navigation it is allowing: the navigator checks the flag while it
+   * dispatches, so a state update would come too late and the
+   * navigation would be blocked. The hook returns a function that
+   * switches it off immediately, and it is kept in a ref so the
+   * alert's button can reach it.
+   */
+  const disableRemovalPreventionRef = useRef<(() => void) | null>(null);
+
+  /** Leaves the map picker and throws the picked point away. */
+  const leaveMapPicker = useCallback(() => {
+    setIsPickingOnMap(false);
+    setMapPick(null);
+  }, []);
+
+  /**
+   * Asks whether the user really wants to sign out.
+   */
+  const requestSignOut = useCallback(() => {
+    if (isAskingToLeave.current) {
+      return;
+    }
+
+    isAskingToLeave.current = true;
+
+    Alert.alert(
+      STRINGS.signOut.title,
+      STRINGS.signOut.message,
+      [
+        {
+          text: STRINGS.signOut.cancel,
+          style: 'cancel',
+        },
+        {
+          text: STRINGS.signOut.confirm,
+          style: 'destructive',
+          onPress: () => {
+            // The screen is about to be removed, so the navigator's
+            // protection has to come off first — otherwise it would
+            // refuse the very navigation that signs the user out.
+            disableRemovalPreventionRef.current?.();
+            signOut();
+            goToLogin();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {
+          isAskingToLeave.current = false;
+        },
+      },
+    );
+  }, [goToLogin, signOut]);
+
+  /**
+   * What happens when the user tries to leave the screen.
+   *
+   * In the map picker the back control means "put the map away" —
+   * it is a mode, not a step out of the app. Everywhere else it means
+   * "leave the session", which is what the alert asks about.
+   */
+  const handleLeaveRequest = useCallback(() => {
+    if (isPickingOnMap) {
+      leaveMapPicker();
+      return;
+    }
+
+    requestSignOut();
+  }, [isPickingOnMap, leaveMapPicker, requestSignOut]);
+
+  /**
+   * The navigator must not remove this screen on its own.
+   *
+   * This is the hook React Navigation documents for exactly this: it
+   * catches any navigation action that would remove the route, not
+   * just the ones a button triggers.
+   */
+  const disableRemovalPrevention = usePreventRemove(
+    true,
+    handleLeaveRequest,
+  );
+
+  useEffect(() => {
+    disableRemovalPreventionRef.current = disableRemovalPrevention;
+  }, [disableRemovalPrevention]);
+
+  /**
+   * The Android hardware back button.
+   *
+   * React Native's `BackHandler` is the documented way to intercept
+   * it. Returning `true` tells the runtime the press has been handled,
+   * and the navigator never sees it — so the screen does not pop
+   * behind the alert.
+   *
+   * The listener is registered through `useFocusEffect` so it only
+   * exists while this screen is on top, and it is removed when the
+   * screen loses focus.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          handleLeaveRequest();
+          return true;
+        },
+      );
+
+      return () => subscription.remove();
+    }, [handleLeaveRequest]),
+  );
 
   /**
    * The end of the trip that is live right now.
@@ -137,50 +298,74 @@ const SetLocationsScreen: React.FC = () => {
     setQuery('');
   };
 
+  /**
+   * A point dropped on the map.
+   *
+   * A point outside the area the app can plan a trip in is refused
+   * with an alert rather than being accepted silently — the app has
+   * no road geometry and no place name for it, so accepting it would
+   * produce a route the app cannot honour.
+   */
+  const handleMapPress = useCallback(
+    (coordinate: {latitude: number; longitude: number}) => {
+      if (!isInsideServiceArea(coordinate)) {
+        Alert.alert(
+          STRINGS.locations.outOfAreaTitle,
+          STRINGS.locations.outOfAreaMessage,
+        );
+        return;
+      }
+
+      setMapPick({
+        id: `picked-${coordinate.latitude.toFixed(5)}-${coordinate.longitude.toFixed(5)}`,
+        name: STRINGS.locations.pickedLocation,
+        address: `${coordinate.latitude.toFixed(4)}, ${coordinate.longitude.toFixed(4)}`,
+        icon: 'target',
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude,
+      });
+    },
+    [],
+  );
+
   const handleConfirmMapPick = () => {
     if (!mapPick) {
       return;
     }
+
     applyChoice(mapPick);
-    setIsPickingOnMap(false);
-    setMapPick(null);
+    leaveMapPicker();
   };
 
   const tripIsComplete = isTripComplete(pickup, dropoff);
 
   return (
-    <AppScreen edges={['top', 'bottom']}>
-      <ScreenHeader
-        title={STRINGS.locations.title}
-        subtitle={STRINGS.locations.step}
-        onBack={goToLogin}
-      />
-
+    <AppScreen edges={['top']}>
+      {/*
+        The header belongs to the list screen. The map picker is a
+        mode, not a step — it says "tap the map", not "step 1 of 2" —
+        so the header steps aside and the map's own back button takes
+        over.
+      */}
       {isPickingOnMap ? (
         <View style={styles.mapMode}>
           <RouteMap
-            pickup={mapPick}
+            pickup={null}
             dropoff={null}
+            pickedPlace={mapPick}
+            region={SERVICE_AREA_REGION}
             trafficMessage=""
             showTrafficChip={false}
-            liveMapEnabled={false}
-            onBack={() => {
-              setIsPickingOnMap(false);
-              setMapPick(null);
-            }}
-            onPressMap={coordinate =>
-              setMapPick({
-                id: `picked-${coordinate.latitude}-${coordinate.longitude}`,
-                name: 'Picked location',
-                address: `${coordinate.latitude.toFixed(4)}, ${coordinate.longitude.toFixed(4)}`,
-                icon: 'target',
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-              })
-            }
+            liveMapEnabled={liveMapEnabled}
+            onBack={leaveMapPicker}
+            onPressMap={handleMapPress}
             style={styles.map}
           />
-          <View style={styles.mapFooter}>
+          <View
+            style={[
+              styles.mapFooter,
+              {paddingBottom: spacing.xl + insets.bottom},
+            ]}>
             <AppButton
               label={
                 mapPick
@@ -189,11 +374,18 @@ const SetLocationsScreen: React.FC = () => {
               }
               onPress={handleConfirmMapPick}
               disabled={!mapPick}
+              testID="map-pick-confirm"
             />
           </View>
         </View>
       ) : (
         <>
+          <ScreenHeader
+            title={STRINGS.locations.title}
+            subtitle={STRINGS.locations.step}
+            onBack={handleLeaveRequest}
+          />
+
           <ScrollView
             contentContainerStyle={styles.body}
             keyboardShouldPersistTaps="handled"
@@ -230,9 +422,16 @@ const SetLocationsScreen: React.FC = () => {
                     testID: 'use-current',
                   },
                   {
+                    /*
+                      The picker needs a real map: the flat-map
+                      fallback is a picture and cannot be panned or
+                      tapped, so the action is offered only when the
+                      live map is there.
+                    */
                     label: STRINGS.locations.pickOnMap,
                     icon: 'map',
                     onPress: () => setIsPickingOnMap(true),
+                    disabled: !liveMapEnabled,
                     testID: 'pick-on-map',
                   },
                 ]}
@@ -297,14 +496,14 @@ const SetLocationsScreen: React.FC = () => {
             )}
           </ScrollView>
 
-          <View style={styles.footer}>
+          <AppFooter>
             <AppButton
               label={STRINGS.locations.next}
               onPress={goToTripReady}
               disabled={!tripIsComplete}
               testID="set-locations-next"
             />
-          </View>
+          </AppFooter>
         </>
       )}
     </AppScreen>
@@ -337,14 +536,6 @@ const styles = StyleSheet.create({
   customButton: {
     marginTop: spacing.lg,
     alignSelf: 'stretch',
-  },
-  footer: {
-    backgroundColor: colors.background.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.subtle,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xxl,
   },
   mapMode: {
     flex: 1,

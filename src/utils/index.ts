@@ -9,8 +9,7 @@ export {
   isGoogleMapsConfigured,
   toGoogleTravelMode,
   formatPlaceForMaps,
-  buildGoogleMapsNavigationUrl,
-  buildGoogleMapsDirectionsUrl,
+  buildGoogleMapsRouteUrl,
 } from './maps';
 export {
   defaultLocationTarget,

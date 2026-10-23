@@ -12,6 +12,18 @@ import type {RouteLeg} from '../../../types';
  * Each row is 67 px tall: a 32 px circular manoeuvre glyph on the
  * left, the instruction and its detail in the middle, and the leg's
  * distance right-aligned. Rows after the first carry a hairline.
+ *
+ * THE GLYPH IS THE SAME ON EVERY ROW
+ *
+ * That is not a shortcut — it is what the design does. In the Figma,
+ * legs 2, 3 and 4 of the list share the component `EL-a5b41d96`, and
+ * leg 1 carries a standalone node whose exported artwork is identical
+ * to that component's. There is one arrow in the design, so there is
+ * one arrow here.
+ *
+ * `leg.turn` still records the real-world manoeuvre, because that is
+ * what a routing API returns and what the sheet's own summary is
+ * built from. It is data, not artwork.
  */
 export interface TurnByTurnListProps {
   /** The legs to render, in order. */
@@ -25,7 +37,7 @@ export const TurnByTurnList: React.FC<TurnByTurnListProps> = ({legs}) => (
         key={leg.id}
         style={[styles.row, index > 0 ? styles.divider : null]}>
         <AppIcon
-          name={leg.turn === 'right' ? 'turnRight' : 'turnStraight'}
+          name="turn"
           size={32}
           color={colors.text.primary}
           backgroundColor={colors.background.muted}

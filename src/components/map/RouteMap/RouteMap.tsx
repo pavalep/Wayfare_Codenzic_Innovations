@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -6,7 +6,17 @@ import {
   type LayoutChangeEvent,
   type ViewStyle,
 } from 'react-native';
-import MapView, {Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {
+  Marker,
+  Polyline,
+  PROVIDER_GOOGLE,
+  type MapType,
+  type Region,
+} from 'react-native-maps';
+import Animated, {
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated';
 
 import {colors, radius, shadows, spacing} from '../../../theme';
 import {AppIcon} from '../../core/AppIcon';
@@ -44,10 +54,23 @@ import {StaticRouteMap} from '../StaticRouteMap';
  * renderings:
  *
  *   • the dashed brand-coloured route polyline
- *   • an orange origin pin and a dark destination pin, both ringed
- *     in white
+ *   • the design's own map markers — an orange disc with a car for
+ *     the origin, a deep-navy disc with a pin for the destination,
+ *     both ringed in white
  *   • the floating back / layers buttons and the dark "Heavy traffic"
  *     chip, all positioned absolutely over the map
+ *
+ * The layers button is the design's, opposite the back button in the
+ * top-right corner, and it switches the base map between the standard
+ * road map and the satellite imagery.
+ *
+ * THE MAP FILLS THE SCREEN
+ *
+ * The map is not a fixed band. It fills the whole screen and the
+ * sheet floats over the bottom of it, so the route can be framed in
+ * the part of the map the sheet leaves visible — which changes as the
+ * sheet is dragged. The camera is anchored to that band; see
+ * `buildRouteRegion`.
  */
 export interface RouteMapProps {
   /** The trip's origin. */
@@ -58,13 +81,42 @@ export interface RouteMapProps {
   trafficMessage: string;
   /** Called when the back button is pressed. */
   onBack: () => void;
-  /** Called when the layers button is pressed. */
+  /**
+   * Called when the layers button is pressed.
+   *
+   * Defaults to switching the map between the standard road map and
+   * the satellite imagery, which is the pair the button's stacked
+   * layers glyph stands for.
+   */
   onToggleLayers?: () => void;
   /**
    * Called when the map itself is tapped, with the tapped
    * coordinate. Used by the "Pick on map" flow.
    */
   onPressMap?: (coordinate: {latitude: number; longitude: number}) => void;
+  /**
+   * The camera, when the caller already knows where the map should
+   * look.
+   *
+   * The route view leaves this unset: it builds its own region from
+   * the two ends of the trip and the height of the sheet (see
+   * `buildRouteRegion`). The map picker passes the service area
+   * instead, because there is no route to frame — only an area to
+   * show.
+   *
+   * When this is set it wins over the computed route region.
+   */
+  region?: Region;
+  /**
+   * A single point the user has chosen on the map.
+   *
+   * It is drawn with the design's own destination marker — the navy
+   * disc with the pin in it — because that is the marker the Figma
+   * uses for "a point on the map". The route view never passes this:
+   * it has two named ends and draws them as the origin and the
+   * destination instead.
+   */
+  pickedPlace?: Place | null;
   /** Hides the traffic chip — used by the map-picker mode. */
   showTrafficChip?: boolean;
   /**
@@ -75,6 +127,28 @@ export interface RouteMapProps {
    * the question has to be asked at all.
    */
   liveMapEnabled: boolean;
+  /**
+   * Where the sheet's top edge is, in pixels below the top of the map.
+   *
+   * The map is a sibling of the sheet rather than a child of it, so it
+   * cannot read the sheet's position for itself; the route screen owns
+   * this shared value and the sheet writes into it. The traffic chip
+   * floats just above the sheet's top edge, so it follows it.
+   */
+  sheetTop?: SharedValue<number>;
+  /**
+   * Where the route's middle sits, as a fraction of the map's height.
+   *
+   * This is the middle of the band of screen the sheet leaves
+   * visible, so the route is framed in the part of the map that can
+   * actually be seen.
+   */
+  anchorRatio?: number;
+  /**
+   * How tall that band is, as a fraction of the map's height,
+   * measured against the sheet's resting height.
+   */
+  bandRatio?: number;
   /** Style for the map container. */
   style?: ViewStyle;
 }
@@ -86,42 +160,93 @@ export const RouteMap: React.FC<RouteMapProps> = ({
   onBack,
   onToggleLayers,
   onPressMap,
+  region: regionOverride,
+  pickedPlace,
   showTrafficChip = true,
   liveMapEnabled,
+  sheetTop,
+  anchorRatio = 0.185,
+  bandRatio = 0.37,
   style,
 }) => {
   const coordinates =
     pickup && dropoff ? buildRouteCoordinates(pickup, dropoff) : [];
 
-  const region =
-    pickup && dropoff ? buildRouteRegion(pickup, dropoff) : undefined;
+  /**
+   * The map's own size.
+   *
+   * The camera is built from it, because the camera has to know the
+   * shape of the map it is framing the route in.
+   */
+  const [size, setSize] = useState({width: 0, height: 0});
 
   /**
-   * The measured height of the map box.
+   * Which kind of map is showing.
    *
-   * The traffic chip is positioned from it, because the chip has to
-   * clear the summary sheet that overlaps the bottom of the map. The
-   * Figma puts the chip at y 253 in a 340 px map, so its bottom edge
-   * sits 51.5 px above the map's floor — a proportion, not a fixed
-   * offset, which is what keeps it clear of the sheet on a screen of
-   * any height.
+   * The design puts a layers button in the top-right corner of the
+   * route view, opposite the back button, and a layers button means
+   * "change what the map is showing". The one thing it can change
+   * here is the base map: the standard road map or the satellite
+   * imagery, which is the same pair Google Maps offers in its own
+   * layers menu.
    */
-  const [mapHeight, setMapHeight] = useState(0);
+  const [mapType, setMapType] = useState<MapType>('standard');
+
+  const handleToggleLayers = useCallback(() => {
+    setMapType(current => (current === 'standard' ? 'satellite' : 'standard'));
+  }, []);
 
   const handleLayout = (event: LayoutChangeEvent) => {
-    const {height} = event.nativeEvent.layout;
-    setMapHeight(current => (current === height ? current : height));
+    const {width, height} = event.nativeEvent.layout;
+    setSize(current =>
+      current.width === width && current.height === height
+        ? current
+        : {width, height},
+    );
   };
 
+  /**
+   * The camera.
+   *
+   * The route view frames the two ends of the trip in the band of
+   * screen the sheet leaves visible. The map picker has no route to
+   * frame, so it uses the region the caller asked for instead.
+   */
+  const computedRegion =
+    pickup && dropoff && size.width > 0
+      ? buildRouteRegion(pickup, dropoff, {
+          mapWidth: size.width,
+          mapHeight: size.height,
+          anchorRatio,
+          bandRatio,
+        })
+      : undefined;
+
+  const region = regionOverride ?? computedRegion;
+
+  /**
+   * The traffic chip's position.
+   *
+   * It floats just above the sheet, so its distance from the bottom
+   * of the map is whatever is left of the map below the sheet's top
+   * edge, plus the gap between the two.
+   */
+  const chipStyle = useAnimatedStyle(
+    () => ({
+      bottom:
+        size.height - (sheetTop ? sheetTop.value : 0) + TRAFFIC_CHIP_CLEARANCE,
+    }),
+    [size.height],
+  );
+
   return (
-    <View
-      style={[styles.container, style]}
-      onLayout={handleLayout}>
+    <View style={[styles.container, style]} onLayout={handleLayout}>
       {liveMapEnabled ? (
         <MapView
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFill}
           region={region}
+          mapType={mapType}
           scrollEnabled
           zoomEnabled
           rotateEnabled={false}
@@ -148,12 +273,13 @@ export const RouteMap: React.FC<RouteMapProps> = ({
           {pickup ? (
             <Marker
               coordinate={{
-                latitude: pickup.latitude ?? 25.2048,
-                longitude: pickup.longitude ?? 55.2708,
+                latitude: pickup.latitude ?? 25.1858,
+                longitude: pickup.longitude ?? 51.5312,
               }}
-              anchor={{x: 0.5, y: 0.5}}
-              tracksViewChanges={false}>
-              <View style={[styles.pin, styles.pinOrigin]} />
+              anchor={{x: 0.5, y: 0.5}}>
+              <View style={styles.marker}>
+                <AppIcon name="markerOrigin" size={36} />
+              </View>
             </Marker>
           ) : null}
 
@@ -163,9 +289,29 @@ export const RouteMap: React.FC<RouteMapProps> = ({
                 latitude: dropoff.latitude ?? 25.2836,
                 longitude: dropoff.longitude ?? 51.5042,
               }}
-              anchor={{x: 0.5, y: 0.5}}
-              tracksViewChanges={false}>
-              <View style={[styles.pin, styles.pinDestination]} />
+              anchor={{x: 0.5, y: 0.5}}>
+              <View style={styles.marker}>
+                <AppIcon name="markerDestination" size={32} />
+              </View>
+            </Marker>
+          ) : null}
+
+          {/*
+            The point the user has chosen on the map. It uses the
+            design's own destination marker — the Figma's marker for
+            "a point on the map" — so the picker does not invent an
+            icon the design never drew.
+          */}
+          {pickedPlace ? (
+            <Marker
+              coordinate={{
+                latitude: pickedPlace.latitude ?? 25.2836,
+                longitude: pickedPlace.longitude ?? 51.5042,
+              }}
+              anchor={{x: 0.5, y: 0.5}}>
+              <View style={styles.marker}>
+                <AppIcon name="markerDestination" size={32} />
+              </View>
             </Marker>
           ) : null}
         </MapView>
@@ -185,48 +331,58 @@ export const RouteMap: React.FC<RouteMapProps> = ({
       )}
 
       {/* ── Floating controls ── */}
+      {/*
+        The back and layers buttons are the design's OWN button
+        artwork — one SVG each, a white 44 px rounded square with the
+        glyph in it (Figma nodes #1:352 and #1:355). The white square
+        is part of the SVG, so the pressable underneath is
+        transparent and only carries the shadow.
+      */}
       <MapButton label="Back" onPress={onBack} style={styles.backButton}>
-        <AppIcon name="back" size={20} color={colors.text.primary} />
+        <AppIcon name="mapBack" color={colors.text.primary} />
       </MapButton>
 
-      {onToggleLayers ? (
-        <MapButton
-          label="Map layers"
-          onPress={onToggleLayers}
-          style={styles.layersButton}>
-          <AppIcon name="layers" size={22} color={colors.text.primary} />
-        </MapButton>
-      ) : null}
+      <MapButton
+        label="Map layers"
+        onPress={onToggleLayers ?? handleToggleLayers}
+        style={styles.layersButton}>
+        <AppIcon
+          name="mapLayers"
+          color={
+            mapType === 'standard' ? colors.text.primary : colors.brand.primary
+          }
+        />
+      </MapButton>
 
       {/* ── Traffic chip ── */}
       {showTrafficChip ? (
-        <View
-          style={[
-            styles.trafficChip,
-            // The chip sits above the sheet that overlaps the map's
-            // floor, so it is placed as a proportion of the map's own
-            // height rather than a fixed offset.
-            {bottom: mapHeight * TRAFFIC_CHIP_BOTTOM_RATIO},
-          ]}>
+        <Animated.View style={[styles.trafficChip, chipStyle]}>
           <AppIcon name="traffic" size={16} color={colors.text.onBrand} />
           <AppText variant="chip" tone="onBrand" numberOfLines={1}>
             {trafficMessage}
           </AppText>
-        </View>
+        </Animated.View>
       ) : null}
     </View>
   );
 };
 
 /**
- * Where the traffic chip's bottom edge sits, as a fraction of the
- * map's height.
+ * How far the traffic chip's bottom edge sits above the sheet.
  *
- * From the Figma route-view frame: the map is 340 px tall and the
- * chip occupies y 253 → 288.5, so its floor is 51.5 px above the
- * map's own floor — 51.5 / 340.
+ * From the Figma route-view frame: the chip occupies y 253 → 288.5
+ * and the sheet starts at y 311, so the gap between them is 22.5 px.
  */
-const TRAFFIC_CHIP_BOTTOM_RATIO = 51.5 / 340;
+const TRAFFIC_CHIP_CLEARANCE = spacing.xxl;
+
+/**
+ * The size of the map buttons.
+ *
+ * From the Figma route-view frame: the back and layers buttons are
+ * 44 px squares with a 16 px radius, 16 px in from the top and side
+ * edges of the map.
+ */
+const MAP_BUTTON_SIZE = 44;
 
 // ─── Local helper ───────────────────────────────────────────
 
@@ -253,29 +409,47 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: colors.background.map,
   },
-  pin: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.pill,
-    borderWidth: 2,
-    borderColor: colors.text.onBrand,
+  /**
+   * The marker wrapper.
+   *
+   * The glyph itself carries the design's artwork; the shadow is the
+   * design's shadow token, applied here because a React Native view
+   * cannot carry an SVG drop-shadow filter.
+   */
+  marker: {
     ...shadows.elevated,
   },
-  pinOrigin: {
-    backgroundColor: colors.marker.origin,
-  },
-  pinDestination: {
-    backgroundColor: colors.marker.destination,
-  },
+  /**
+   * The map buttons.
+   *
+   * The design draws each of these as one SVG — a white 44 px
+   * rounded square with a glyph in it, plus a drop-shadow filter on
+   * the group (Figma nodes #1:352 and #1:355).
+   *
+   * The square is drawn HERE rather than inside the SVG, because
+   * Android casts an elevation shadow from the VIEW's outline: a
+   * transparent pressable casts a square halo around the artwork
+   * instead of a shadow shaped like the button. The glyph itself
+   * comes from the icon set.
+   *
+   * The design's own drop shadow is not used. On a live Google map
+   * the land is often almost white, and a 4 %-opacity shadow over a
+   * white square on white ground reads as a grey smudge floating
+   * next to the button rather than as the button's shadow. The 1 px
+   * hairline in the design's border colour does the same job — it
+   * separates the white button from whatever is behind it — and it
+   * is the same hairline the rest of the app uses.
+   */
   button: {
     position: 'absolute',
-    width: 44,
-    height: 44,
+    width: MAP_BUTTON_SIZE,
+    height: MAP_BUTTON_SIZE,
     borderRadius: radius.lg,
     backgroundColor: colors.background.surface,
+    borderWidth: 1,
+    borderColor: colors.border.subtle,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadows.card,
   },
   backButton: {
     left: spacing.lg,

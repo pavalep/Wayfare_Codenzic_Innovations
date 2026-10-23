@@ -11,7 +11,7 @@ import {StatusBar} from 'expo-status-bar';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-import {useAuthStore, useTripStore} from '../src/state';
+import {useAuthStore} from '../src/state';
 import {colors} from '../src/theme';
 
 /**
@@ -45,11 +45,10 @@ export default function RootLayout(): React.JSX.Element | null {
 
   const isSignedIn = useAuthStore(state => state.isAuthenticated);
   const authHydrated = useAuthStore(state => state.hasHydrated);
-  const tripHydrated = useTripStore(state => state.hasHydrated);
 
   /**
    * Hold the first frame until the fonts are registered AND the
-   * persisted stores have been read back.
+   * persisted session has been read back.
    *
    * The second condition matters as much as the first. AsyncStorage
    * is asynchronous, so on a cold start the auth store still reads as
@@ -58,16 +57,20 @@ export default function RootLayout(): React.JSX.Element | null {
    * read that flag, so rendering early would bounce a signed-in user
    * to the login screen on every launch.
    *
+   * Only the SESSION is persisted. The trip is deliberately not — it
+   * is work in progress, and it starts empty on every launch (see
+   * `src/state/tripStore.ts`), so there is nothing to wait for.
+   *
    * If the font load FAILS we still render — a wrong typeface is a
    * much smaller problem than a blank screen.
    */
-  if ((!fontsLoaded && !fontError) || !authHydrated || !tripHydrated) {
+  if ((!fontsLoaded && !fontError) || !authHydrated) {
     return null;
   }
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <SafeAreaProvider>
+      <SafeAreaProvider >
         <StatusBar style="dark" />
         <Stack
           screenOptions={{

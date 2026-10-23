@@ -89,42 +89,41 @@ export function formatPlaceForMaps(
 // ─── URL builders ─────────────────────────────────────────────
 
 /**
- * The `google.navigation:` intent — opens Google Maps straight into
- * turn-by-turn navigation for the destination.
+ * The Google Maps route URL — the documented, universal handoff.
  *
- * This is the deepest handoff the platform offers: the Maps app
- * takes over the screen with its own navigation UI, which is what
- * "Start navigation" should mean on a phone.
+ * It opens the trip in Google Maps on a phone, and in a browser
+ * everywhere else, with BOTH ends of the trip in it.
  *
- * The intent takes ONE place — the destination. The origin is not
- * part of the scheme, so the URL is built for the destination only.
+ * WHY NOT THE `google.navigation:` INTENT
+ *
+ * The `google.navigation:` intent is the deeper handoff: it would
+ * take over the screen with Google Maps' own turn-by-turn UI. It
+ * takes the destination as `q` and the origin as `saddr`.
+ *
+ * On the Google Maps build this was tested against, `saddr` is
+ * silently ignored — the origin comes back as "Your location", the
+ * device's position, and the route it plans starts from there. That
+ * was reproduced with an origin coordinate and with an origin
+ * address, and with both the opaque (`google.navigation:q=…`) and
+ * the hierarchical (`google.navigation://q=…`) form of the URL. The
+ * intent opens without an error, so the app cannot tell that the
+ * origin was dropped — it would send the user to the wrong place
+ * without saying anything.
+ *
+ * A route from the wrong end of the trip is worse than a route that
+ * needs one extra tap to start, so the universal Directions URL is
+ * used instead. It carries the origin in `origin=`, honours
+ * `travelmode=`, and opens the Maps app with the full route when the
+ * Maps app is installed.
  */
-export function buildGoogleMapsNavigationUrl(
-  destination: {name: string; latitude?: number; longitude?: number},
-  mode: 'drive' | 'ride' | 'walk',
-): string {
-  const target = formatPlaceForMaps(destination);
-  return `google.navigation:q=${encodeURIComponent(
-    target,
-  )}&mode=${toGoogleTravelMode(mode)}`;
-}
-
-/**
- * The Google Maps Directions URL — the documented, universal
- * fallback.
- *
- * This one carries BOTH ends of the trip, so it is the better
- * fallback: if the Maps app is not installed, the browser opens
- * google.com and shows the same route on the web.
- */
-export function buildGoogleMapsDirectionsUrl(
-  pickup: {name: string; latitude?: number; longitude?: number},
+export function buildGoogleMapsRouteUrl(
+  origin: {name: string; latitude?: number; longitude?: number},
   destination: {name: string; latitude?: number; longitude?: number},
   mode: 'drive' | 'ride' | 'walk',
 ): string {
   const params = [
     'api=1',
-    `origin=${encodeURIComponent(formatPlaceForMaps(pickup))}`,
+    `origin=${encodeURIComponent(formatPlaceForMaps(origin))}`,
     `destination=${encodeURIComponent(formatPlaceForMaps(destination))}`,
     `travelmode=${toGoogleTravelMode(mode)}`,
   ];

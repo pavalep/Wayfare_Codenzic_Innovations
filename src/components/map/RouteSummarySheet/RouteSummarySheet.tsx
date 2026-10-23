@@ -1,14 +1,15 @@
-import React from 'react';
-import {ScrollView, StyleSheet, View, type ViewStyle} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, {useCallback} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+import Animated, {type SharedValue} from 'react-native-reanimated';
 
-import {colors, radius, shadows, spacing} from '../../../theme';
+import {colors, radius, spacing} from '../../../theme';
 import {STRINGS} from '../../../constants';
-import {AppButton} from '../../core/AppButton';
 import {AppText} from '../../core/AppText';
 import {ModeTabs} from '../../layout/ModeTabs';
 import {TurnByTurnList} from '../../layout/TurnByTurnList';
-import type {Place, RouteSummary, TravelMode} from '../../../types';
+import {useSheetLayout} from '../../../hooks/useSheetLayout';
+import type {Place, RouteLeg, RouteSummary, TravelMode} from '../../../types';
 
 /**
  * The route summary sheet that slides up over the map.
@@ -22,11 +23,48 @@ import type {Place, RouteSummary, TravelMode} from '../../../types';
  *   • a muted card that repeats the two ends of the trip on a rail,
  *     the same rail the location card uses
  *   • the "Turn by turn" list
- *   • the "Start navigation" button, pinned to the bottom
  *
- * The sheet is taller than the space it occupies on the design
- * frame, so its content scrolls — the same way a real bottom sheet
- * behaves.
+ * THE SHEET'S HEIGHT IS THE VISIBLE HEIGHT
+ *
+ * The sheet is a snap-point sheet with three stops: collapsed onto the
+ * map, the Figma's own resting height, and dragged up to read the
+ * whole list. A snap-point sheet does not resize its content when it
+ * moves — the content is laid out against the tallest stop and the
+ * sheet slides up inside it — so laying this content out normally
+ * would push everything at the bottom of it off the screen at the
+ * shorter stops.
+ *
+ * So the content is laid out against `visibleHeight`, the part of the
+ * sheet that is really on screen, which `useSheetLayout` reads from
+ * the sheet's live position. That is what keeps the bottom of the
+ * sheet's content on the bottom of the screen at every stop.
+ *
+ * WHAT SCROLLS AND WHAT DOES NOT
+ *
+ * Only the turn-by-turn rows scroll. The summary and the mode tabs
+ * stay put, so the numbers never scroll away. The list is a
+ * `BottomSheetFlatList`, the gesture-handler-aware list: it hands the
+ * scroll back to the sheet when it is at the top, which is what lets
+ * a swipe on the rows drag the sheet up to its expanded stop.
+ *
+ * THE ROUTE DETAIL FADES AWAY
+ *
+ * At the lowest stop the sheet is collapsed onto the map, and the
+ * turn-by-turn list is the one thing that gets out of the way: it is
+ * the longest block and the least useful at a glance, and at that
+ * stop the map is the point. The mode tabs and the two ends of the
+ * trip stay, because they are the route's headline facts.
+ *
+ * `detailProgress` fades that one block out as the sheet is dragged
+ * down to the lowest stop.
+ *
+ * THE SHEET'S OWN CHROME
+ *
+ * The white surface, the rounded top and the grab handle belong to
+ * the `BottomSheet` that wraps this, so this component is only the
+ * content. So is the "Start navigation" button: it is pinned to the
+ * bottom of the screen by the route screen, outside the sheet, so
+ * that it is on screen at every stop.
  */
 export interface RouteSummarySheetProps {
   /** The headline numbers for the active travel mode. */
@@ -41,10 +79,24 @@ export interface RouteSummarySheetProps {
   pickup: Place | null;
   /** The trip's destination. */
   dropoff: Place | null;
-  /** Called when "Start navigation" is pressed. */
-  onStartNavigation: () => void;
-  /** Style for the sheet container. */
-  style?: ViewStyle;
+  /**
+   * The space at the bottom of the screen that the "Start navigation"
+   * panel owns.
+   *
+   * The sheet's content is laid out above that panel rather than
+   * under it, so the panel never covers the last row of the
+   * turn-by-turn list and the two ends of the trip stay readable at
+   * the shortest stop.
+   */
+  reservedBottom?: number;
+  /**
+   * Where the sheet's top edge is.
+   *
+   * The map is a sibling of the sheet rather than a child, so it
+   * cannot read the sheet's position for itself; the route screen
+   * owns this shared value and the sheet writes into it.
+   */
+  sheetTop?: SharedValue<number>;
 }
 
 export const RouteSummarySheet: React.FC<RouteSummarySheetProps> = ({
@@ -54,18 +106,26 @@ export const RouteSummarySheet: React.FC<RouteSummarySheetProps> = ({
   onModeChange,
   pickup,
   dropoff,
-  onStartNavigation,
-  style,
+  reservedBottom = 0,
+  sheetTop,
 }) => {
-  const insets = useSafeAreaInsets();
+  const renderLeg = useCallback(
+    ({item}: {item: RouteLeg}) => <TurnByTurnList legs={[item]} />,
+    [],
+  );
+
+  const {contentStyle, detailStyle, isDetailVisible} = useSheetLayout(
+    sheetTop,
+    reservedBottom,
+  );
 
   return (
-  <View style={[styles.sheet, style]}>
-    <View style={styles.handle} />
-
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}>
+    /*
+      The content is sized against the visible part of the sheet, not
+      against the tallest stop, so that the bottom of the content
+      always lands on the bottom of the screen. See the note above.
+    */
+    <Animated.View style={[styles.content, contentStyle]}>
       {/* ── Duration + distance ── */}
       <View style={styles.summaryRow}>
         <View style={styles.summaryLeft}>
@@ -91,12 +151,15 @@ export const RouteSummarySheet: React.FC<RouteSummarySheetProps> = ({
         </View>
       </View>
 
-      {/* ── Mode tabs ── */}
+      {/*
+        The mode tabs and the two ends of the trip stay on screen at
+        every stop: they are the route's headline facts, and a sheet
+        collapsed onto the map should still say where the trip goes.
+      */}
       <View style={styles.tabs}>
         <ModeTabs modes={modes} active={mode} onChange={onModeChange} />
       </View>
 
-      {/* ── The two ends of the trip ── */}
       <View style={styles.endpointsCard}>
         <View style={styles.endpointsRail} pointerEvents="none">
           <View style={styles.endpointsDotOrigin} />
@@ -106,9 +169,11 @@ export const RouteSummarySheet: React.FC<RouteSummarySheetProps> = ({
 
         <View style={styles.endpointsText}>
           <AppText variant="label" numberOfLines={1}>
-            {pickup ? `${pickup.name} · ${pickup.address.split(',')[0]}` : 'Pickup'}
+            {pickup
+              ? `${pickup.name} · ${pickup.address.split(',')[0]}`
+              : 'Pickup'}
           </AppText>
-          <AppText variant="label" numberOfLines={1}>
+          <AppText variant="label" numberOfLines={1} style={styles.endpointsGap}>
             {dropoff
               ? `${dropoff.name} · ${dropoff.address.split(',')[0]}`
               : 'Drop-off'}
@@ -116,57 +181,72 @@ export const RouteSummarySheet: React.FC<RouteSummarySheetProps> = ({
         </View>
       </View>
 
-      {/* ── Turn by turn ── */}
-      <View style={styles.turnByTurn}>
-        <AppText variant="eyebrowLarge" tone="tertiary">
+      {/*
+        The turn-by-turn list is the one thing that is hidden when the
+        sheet is collapsed onto the map. It is the longest block and
+        the least useful at a glance, and at the collapsed stop the
+        map is the point.
+
+        The whole block fades rather than collapsing, so the sheet's
+        layout does not jump as it is dragged.
+      */}
+      <Animated.View
+        style={[styles.listBlock, detailStyle]}
+        pointerEvents={isDetailVisible ? 'auto' : 'none'}>
+        <AppText
+          variant="eyebrowLarge"
+          tone="tertiary"
+          style={styles.turnByTurnLabel}>
           {STRINGS.route.turnByTurn}
         </AppText>
-        <View style={styles.turnByTurnList}>
-          <TurnByTurnList legs={summary.legs} />
-        </View>
-      </View>
-    </ScrollView>
 
-    {/* ── Primary action, pinned to the bottom of the sheet ── */}
-    <View style={[styles.footer, {paddingBottom: spacing.xl + insets.bottom}]}>
-      <StartNavigationButton onPress={onStartNavigation} />
-    </View>
-  </View>
+        {/*
+          The only scrollable part of the sheet. `BottomSheetFlatList`
+          is the gesture-handler-aware list: it hands the scroll back
+          to the sheet when it is at the top, which is what lets a
+          swipe on the rows drag the sheet up to its expanded stop.
+        */}
+        <BottomSheetFlatList
+          data={summary.legs}
+          keyExtractor={leg => leg.id}
+          renderItem={renderLeg}
+          ItemSeparatorComponent={LegDivider}
+          showsVerticalScrollIndicator={false}
+          style={styles.list}
+          contentContainerStyle={[
+            styles.listContent,
+            /*
+             * The list stops above the "Start navigation" panel, so
+             * it only needs the design's own bottom padding here —
+             * the panel's height is already taken out of the sheet's
+             * content, not out of the list.
+             */
+            {paddingBottom: spacing.xl},
+          ]}
+        />
+      </Animated.View>
+    </Animated.View>
   );
 };
 
-// ─── Local helper ───────────────────────────────────────────
-// Kept local so the sheet owns the only "Start navigation" button
-// in the app and the icon/label pair stays in one place.
-
-const StartNavigationButton: React.FC<{onPress: () => void}> = ({onPress}) => (
-  <AppButton
-    label={STRINGS.route.startNavigation}
-    icon="navigation"
-    onPress={onPress}
-    testID="start-navigation"
-  />
-);
+/**
+ * The hairline between two turn-by-turn rows.
+ *
+ * In the Figma the divider is the top border of every list item after
+ * the first — `1px 0px 0px` in `#E6EBEF`, spanning the full row width
+ * including the manoeuvre glyph's column.
+ */
+const LegDivider: React.FC = () => <View style={styles.divider} />;
 
 const styles = StyleSheet.create({
-  sheet: {
-    flex: 1,
-    backgroundColor: colors.background.surface,
-    borderTopLeftRadius: radius.sheet,
-    borderTopRightRadius: radius.sheet,
-    ...shadows.sheet,
-  },
-  handle: {
-    alignSelf: 'center',
-    width: 40,
-    height: 4,
-    borderRadius: radius.pill,
-    backgroundColor: colors.border.subtle,
-    marginTop: spacing.md,
-  },
-  scrollContent: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+  /**
+   * The content fills the visible part of the sheet.
+   *
+   * There is no `flex` here on purpose: the height comes from the
+   * sheet's live position, and a flex basis would fight it.
+   */
+  content: {
+    flexDirection: 'column',
   },
   summaryRow: {
     flexDirection: 'row',
@@ -186,6 +266,17 @@ const styles = StyleSheet.create({
   },
   arrival: {
     marginLeft: spacing.xs,
+  },
+  /**
+   * The turn-by-turn block.
+   *
+   * It takes the space left over by the summary, the mode tabs and
+   * the card, and the list inside it takes the space left over by its
+   * own label, so the rows fill the sheet exactly.
+   */
+  listBlock: {
+    flex: 1,
+    overflow: 'hidden',
   },
   tabs: {
     paddingHorizontal: spacing.xl,
@@ -227,16 +318,36 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: spacing.md,
   },
-  turnByTurn: {
+  /**
+   * The 10 px gap between the two lines of the card.
+   *
+   * The Figma's text container ("Container" #1:389) is 55 px tall and
+   * holds two 22.5 px lines: the first at y=0 and the second at
+   * y=32.5. The gap between them is therefore 32.5 − 22.5 = 10 px.
+   *
+   * Without it the two lines sit on their own 22.5 px line boxes and
+   * the block is only 45 px tall, which pulls the second line up
+   * towards the first one and leaves the destination square on the
+   * rail hanging below the "Home" text instead of level with the
+   * bottom of it — the rail's square is meant to sit on the same
+   * line as the end of the destination label (Figma node #1:388 at
+   * y=45 inside a 55 px rail container).
+   */
+  endpointsGap: {
+    marginTop: 10,
+  },
+  turnByTurnLabel: {
     marginTop: spacing.xxl,
+    marginHorizontal: spacing.xl,
   },
-  turnByTurnList: {
-    marginTop: spacing.md,
+  list: {
+    flex: 1,
+  },
+  listContent: {
     paddingHorizontal: spacing.xl,
   },
-  footer: {
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xl,
+  divider: {
+    height: 1,
+    backgroundColor: colors.border.subtle,
   },
 });

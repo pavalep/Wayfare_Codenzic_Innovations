@@ -1,6 +1,7 @@
 import {useCallback, useState} from 'react';
 
 import {STRINGS} from '../constants';
+import type {SignInResult} from '../state';
 import {validateLogin, type FieldError} from '../utils/validation';
 
 /** Errors keyed by field name. */
@@ -18,8 +19,20 @@ export type LoginErrors = Partial<Record<FieldError['field'], string>>;
  * showing "this email is invalid" while someone is halfway through
  * typing it is hostile. Once a field has been flagged, editing it
  * clears its error immediately so the message never goes stale.
+ *
+ * THE CREDENTIAL CHECK LIVES IN THE STORE
+ *
+ * This hook does not know what an account is. It validates the SHAPE
+ * of what was typed — is this an email, is the password long enough —
+ * and then hands the pair to the caller, which runs the real check
+ * against the accounts registered on this device.
+ *
+ * The refusal comes back as a `SignInResult` and is turned into a
+ * field error here, so the message lands on the field that caused it:
+ * an unknown email is flagged on the email field, a wrong password on
+ * the password field.
  */
-export function useLoginForm(onSuccess: (email: string) => void) {
+export function useLoginForm(onSignIn: (email: string, password: string) => SignInResult) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
@@ -39,9 +52,10 @@ export function useLoginForm(onSuccess: (email: string) => void) {
   }, []);
 
   /**
-   * Validates and, if the form is good, hands the email to
-   * `onSuccess`. Returns whether the submission was accepted so the
-   * caller can react (e.g. keep focus on the first bad field).
+   * Validates, then asks the caller to check the credentials.
+   *
+   * Returns whether the submission was accepted so the caller can
+   * react (e.g. keep focus on the first bad field).
    */
   const submit = useCallback((): boolean => {
     const found = validateLogin(email, password, STRINGS.login.errors);
@@ -54,10 +68,21 @@ export function useLoginForm(onSuccess: (email: string) => void) {
       return false;
     }
 
+    const result = onSignIn(email.trim().toLowerCase(), password);
+
+    if (result === 'unknown-email') {
+      setErrors({email: STRINGS.login.errors.unknownAccount});
+      return false;
+    }
+
+    if (result === 'wrong-password') {
+      setErrors({password: STRINGS.login.errors.wrongPassword});
+      return false;
+    }
+
     setErrors({});
-    onSuccess(email.trim().toLowerCase());
     return true;
-  }, [email, password, onSuccess]);
+  }, [email, onSignIn, password]);
 
   return {
     email,

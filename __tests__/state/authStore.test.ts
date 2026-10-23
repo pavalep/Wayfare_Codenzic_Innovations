@@ -1,7 +1,7 @@
 /**
- * The auth store's hydration contract.
+ * The auth store's two contracts.
  *
- * WHY THIS TEST EXISTS
+ * THE HYDRATION CONTRACT
  *
  * `persist` rehydrates asynchronously. On a cold start the store holds
  * its initial — signed-out — state for a few frames even though a
@@ -13,6 +13,14 @@
  * These tests pin that contract down: the flag flips once the read
  * completes, the session survives a restart, and a storage failure
  * still releases the app instead of stranding it.
+ *
+ * THE ACCOUNTS CONTRACT
+ *
+ * The accounts registered on the device are the source of truth for
+ * the login: only an account that was created on the register screen
+ * can be signed in to. These tests pin that down too — an unknown
+ * email is refused, a wrong password is refused, a duplicate
+ * registration is refused, and the accounts survive a restart.
  */
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -75,27 +83,43 @@ describe('useAuthStore', () => {
   it('records the session on sign in', () => {
     const useAuthStore = loadStore();
 
-    useAuthStore.getState().signIn('  PAVAL@Example.com ');
+    useAuthStore
+      .getState()
+      .register('Paval', '  PAVAL@Example.com ', 'correct horse');
+
+    const result = useAuthStore
+      .getState()
+      .signIn('  PAVAL@Example.com ', 'correct horse');
+
+    expect(result).toBe('ok');
 
     const state = useAuthStore.getState();
     expect(state.isAuthenticated).toBe(true);
     expect(state.email).toBe('paval@example.com');
   });
 
-  it('persists only the session, never the actions', async () => {
+  it('persists the session and the accounts, never the actions', async () => {
     const storage = loadStorage();
     const useAuthStore = loadStore();
 
-    useAuthStore.getState().signIn('paval@example.com');
+    useAuthStore
+      .getState()
+      .register('Paval', 'paval@example.com', 'correct horse');
+    useAuthStore.getState().signIn('paval@example.com', 'correct horse');
     await flushHydration();
 
     const raw = await storage.getItem(STORAGE_KEY);
     expect(raw).not.toBeNull();
 
     const parsed = JSON.parse(raw as string).state;
-    expect(Object.keys(parsed).sort()).toEqual(['email', 'isAuthenticated']);
+    expect(Object.keys(parsed).sort()).toEqual([
+      'accounts',
+      'email',
+      'isAuthenticated',
+    ]);
     expect(parsed.email).toBe('paval@example.com');
     expect(parsed.isAuthenticated).toBe(true);
+    expect(parsed.accounts).toHaveLength(1);
   });
 
   it('restores a persisted session on a cold start', async () => {
@@ -123,7 +147,10 @@ describe('useAuthStore', () => {
     const storage = loadStorage();
     const useAuthStore = loadStore();
 
-    useAuthStore.getState().signIn('paval@example.com');
+    useAuthStore
+      .getState()
+      .register('Paval', 'paval@example.com', 'correct horse');
+    useAuthStore.getState().signIn('paval@example.com', 'correct horse');
     await flushHydration();
 
     useAuthStore.getState().signOut();
@@ -133,5 +160,112 @@ describe('useAuthStore', () => {
     const parsed = JSON.parse(raw as string).state;
     expect(parsed.isAuthenticated).toBe(false);
     expect(parsed.email).toBeNull();
+  });
+
+  it('keeps the accounts when the session ends', () => {
+    const useAuthStore = loadStore();
+
+    useAuthStore
+      .getState()
+      .register('Paval', 'paval@example.com', 'correct horse');
+    useAuthStore.getState().signIn('paval@example.com', 'correct horse');
+    useAuthStore.getState().signOut();
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().accounts).toHaveLength(1);
+    // The account is still usable after signing out.
+    expect(
+      useAuthStore.getState().signIn('paval@example.com', 'correct horse'),
+    ).toBe('ok');
+  });
+
+  it('refuses to register the same email twice', () => {
+    const useAuthStore = loadStore();
+
+    expect(
+      useAuthStore
+        .getState()
+        .register('Paval', 'paval@example.com', 'correct horse'),
+    ).toBe('ok');
+
+    expect(
+      useAuthStore
+        .getState()
+        .register('Someone else', 'PAVAL@example.com', 'another one'),
+    ).toBe('email-taken');
+
+    expect(useAuthStore.getState().accounts).toHaveLength(1);
+  });
+
+  it('refuses to sign in with an email that was never registered', () => {
+    const useAuthStore = loadStore();
+
+    expect(
+      useAuthStore.getState().signIn('stranger@example.com', 'whatever'),
+    ).toBe('unknown-email');
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('refuses to sign in with the wrong password', () => {
+    const useAuthStore = loadStore();
+
+    useAuthStore
+      .getState()
+      .register('Paval', 'paval@example.com', 'correct horse');
+
+    expect(
+      useAuthStore.getState().signIn('paval@example.com', 'wrong password'),
+    ).toBe('wrong-password');
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('does not store the password itself', () => {
+    const useAuthStore = loadStore();
+
+    useAuthStore
+      .getState()
+      .register('Paval', 'paval@example.com', 'correct horse');
+
+    const [account] = useAuthStore.getState().accounts;
+    expect(account.passwordDigest).not.toContain('correct horse');
+    expect(account.name).toBe('Paval');
+    expect(account.email).toBe('paval@example.com');
+  });
+
+  it('lets a registered account sign in after a restart', async () => {
+    const storage = loadStorage();
+    const {digestSecret} = require('../../src/utils/hash');
+
+    // Seed storage the way a previous run of the app would have left
+    // it: the account is on disk, the session is not.
+    await storage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        state: {
+          email: null,
+          isAuthenticated: false,
+          accounts: [
+            {
+              name: 'Paval',
+              email: 'paval@example.com',
+              passwordDigest: digestSecret('correct horse'),
+            },
+          ],
+        },
+        version: 0,
+      }),
+    );
+
+    // The store is created AFTER the seed, so it hydrates from it.
+    const useAuthStore = loadStore();
+    await flushHydration();
+
+    expect(useAuthStore.getState().accounts).toHaveLength(1);
+    expect(
+      useAuthStore.getState().signIn('paval@example.com', 'correct horse'),
+    ).toBe('ok');
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
 });

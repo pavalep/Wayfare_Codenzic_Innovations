@@ -3,13 +3,14 @@ import {Image, StyleSheet, View, type LayoutChangeEvent} from 'react-native';
 import Svg, {Polyline} from 'react-native-svg';
 
 import mapBackground from '../../../../assets/map/map-background.png';
-import {colors, radius, shadows} from '../../../theme';
+import {colors, shadows} from '../../../theme';
 import type {Place} from '../../../types';
 import {
   buildRouteBounds,
   buildRouteCoordinates,
   projectCoordinate,
 } from '../../../data/routeGeometry';
+import {AppIcon} from '../../core/AppIcon';
 
 /**
  * The flat-map fallback.
@@ -43,8 +44,12 @@ export interface StaticRouteMapProps {
   style?: object;
 }
 
-/** The diameter of both pins, in pixels. */
-const PIN_SIZE = 32;
+/**
+ * The marker diameters, from the Figma route-view frame: the origin
+ * marker is 36 px and the destination marker is 32 px.
+ */
+const ORIGIN_MARKER_SIZE = 36;
+const DESTINATION_MARKER_SIZE = 32;
 
 export const StaticRouteMap: React.FC<StaticRouteMapProps> = ({
   pickup,
@@ -122,24 +127,24 @@ export const StaticRouteMap: React.FC<StaticRouteMapProps> = ({
       {origin ? (
         <View
           style={[
-            styles.pin,
-            styles.pinOrigin,
-            {left: origin.x - PIN_SIZE / 2, top: origin.y - PIN_SIZE / 2},
-          ]}
-        />
+            styles.marker,
+            {left: origin.x - ORIGIN_MARKER_SIZE / 2, top: origin.y - ORIGIN_MARKER_SIZE / 2},
+          ]}>
+          <AppIcon name="markerOrigin" size={ORIGIN_MARKER_SIZE} />
+        </View>
       ) : null}
 
       {destination ? (
         <View
           style={[
-            styles.pin,
-            styles.pinDestination,
+            styles.marker,
             {
-              left: destination.x - PIN_SIZE / 2,
-              top: destination.y - PIN_SIZE / 2,
+              left: destination.x - DESTINATION_MARKER_SIZE / 2,
+              top: destination.y - DESTINATION_MARKER_SIZE / 2,
             },
-          ]}
-        />
+          ]}>
+          <AppIcon name="markerDestination" size={DESTINATION_MARKER_SIZE} />
+        </View>
       ) : null}
     </View>
   );
@@ -150,19 +155,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: colors.background.map,
   },
-  pin: {
+  /**
+   * The marker wrapper. The glyph carries the design's artwork; the
+   * shadow is the design's shadow token, because a React Native view
+   * cannot carry an SVG drop-shadow filter.
+   */
+  marker: {
     position: 'absolute',
-    width: PIN_SIZE,
-    height: PIN_SIZE,
-    borderRadius: radius.pill,
-    borderWidth: 2,
-    borderColor: colors.text.onBrand,
     ...shadows.elevated,
-  },
-  pinOrigin: {
-    backgroundColor: colors.marker.origin,
-  },
-  pinDestination: {
-    backgroundColor: colors.marker.destination,
   },
 });

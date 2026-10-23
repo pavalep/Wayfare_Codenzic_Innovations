@@ -5,7 +5,8 @@ import {STRINGS} from '../../constants';
 import {useLoginForm} from '../../hooks/useLoginForm';
 import {useAppRouter} from '../../navigation';
 import {useAuthStore} from '../../state';
-import {colors, spacing} from '../../theme';
+import {spacing} from '../../theme';
+import {AppFooter} from '../../components/core/AppFooter';
 import {AppButton} from '../../components/core/AppButton';
 import {AppIcon} from '../../components/core/AppIcon';
 import {AppScreen} from '../../components/core/AppScreen';
@@ -27,20 +28,56 @@ import {AppTextInput} from '../../components/core/AppTextInput';
  *
  * The footer is pinned: the "Log in" button and the sign-up prompt
  * never scroll away.
+ *
+ * WHO CAN LOG IN
+ *
+ * Only the accounts created on the register screen. There is no
+ * backend, so the accounts registered on this device are the only
+ * accounts there are, and they are the source of truth: an email that
+ * was never registered is refused with a message that points at the
+ * register screen, and a password that does not match the one the
+ * account was created with is refused on the password field.
+ *
+ * THE KEYBOARD
+ *
+ * There is nothing to do about the keyboard here, and that is a
+ * deliberate decision rather than an omission.
+ *
+ * The form is short — two fields — and it ends well above where the
+ * keyboard appears, so the fields are never covered by it. The
+ * keyboard simply sits over the bottom of the screen, which is where
+ * the footer is, and the footer stays exactly where it is.
+ *
+ * That is the behaviour a form should have: the primary action does
+ * not jump up and down as the keyboard opens and closes. The screen
+ * that does need to make room is the register screen, whose form is
+ * long enough for the keyboard to reach the fields.
  */
 const LoginScreen: React.FC = () => {
   const {goToRegister, goToSetLocations} = useAppRouter();
   const signIn = useAuthStore(state => state.signIn);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  /**
+   * The credential check, and what happens when it passes.
+   *
+   * The store decides whether the account exists and whether the
+   * password is right; the hook turns a refusal into an error on the
+   * field that caused it. Only a successful check moves the user on.
+   */
   const {email, password, errors, setEmail, setPassword, submit} =
-    useLoginForm(value => {
-      signIn(value);
-      goToSetLocations();
+    useLoginForm((typedEmail, typedPassword) => {
+      const result = signIn(typedEmail, typedPassword);
+
+      if (result === 'ok') {
+        goToSetLocations();
+      }
+
+      return result;
     });
 
   return (
-    <AppScreen edges={['top', 'bottom']}>
+    <AppScreen edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -109,7 +146,7 @@ const LoginScreen: React.FC = () => {
         </Pressable>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <AppFooter>
         <AppButton
           label={STRINGS.login.submit}
           onPress={submit}
@@ -129,7 +166,7 @@ const LoginScreen: React.FC = () => {
             </AppText>
           </Pressable>
         </View>
-      </View>
+      </AppFooter>
     </AppScreen>
   );
 };
@@ -155,14 +192,6 @@ const styles = StyleSheet.create({
   forgot: {
     marginTop: spacing.xl,
     alignSelf: 'flex-start',
-  },
-  footer: {
-    backgroundColor: colors.background.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.subtle,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.lg,
   },
   signUp: {
     flexDirection: 'row',

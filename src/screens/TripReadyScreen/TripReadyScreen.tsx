@@ -5,7 +5,8 @@ import {STRINGS} from '../../constants';
 import {getRouteSummary} from '../../data/route';
 import {useTripPlan} from '../../hooks/useTripPlan';
 import {useAppRouter} from '../../navigation';
-import {colors, radius, shadows, spacing} from '../../theme';
+import {shadows, spacing} from '../../theme';
+import {AppFooter} from '../../components/core/AppFooter';
 import {AppButton} from '../../components/core/AppButton';
 import {AppCard} from '../../components/core/AppCard';
 import {AppScreen} from '../../components/core/AppScreen';
@@ -39,15 +40,30 @@ import {ScreenHeader} from '../../components/layout/ScreenHeader';
  * the type styles are the ones the route sheet uses. Nothing here is
  * invented; the summary card is the route sheet's header block,
  * repeated where the trip is confirmed.
+ *
+ * ONE PLACE FOR THE TWO ENDS OF THE TRIP
+ *
+ * An earlier version of this screen repeated the pickup and the
+ * drop-off in a second card under the summary, which put the same two
+ * names on screen twice — once in the location card at the top and
+ * once again at the bottom. That is noise, not information: the top
+ * card already carries both ends, and a confirmation screen does not
+ * need a second, plainer restatement of what it just showed.
+ *
+ * So the location card is the only place the two ends appear here,
+ * and it is read-only: no clear (×) on either end, no swap control,
+ * and neither row is pressable. The trip was chosen on the screen
+ * before this one; this screen confirms it, and offering to undo it
+ * mid-confirmation would only invite a second trip to be set up.
  */
 const TripReadyScreen: React.FC = () => {
   const {goBack, goToRouteView} = useAppRouter();
-  const {pickup, dropoff, mode, clearPickup, clearDropoff} = useTripPlan();
+  const {pickup, dropoff, mode} = useTripPlan();
 
   const summary = getRouteSummary(mode);
 
   return (
-    <AppScreen edges={['top', 'bottom']}>
+    <AppScreen edges={['top']}>
       <ScreenHeader
         title={STRINGS.tripReady.title}
         subtitle={STRINGS.tripReady.step}
@@ -57,6 +73,15 @@ const TripReadyScreen: React.FC = () => {
       <ScrollView
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}>
+        {/*
+          The two ends of the trip, as the card shows them.
+
+          This is a CONFIRMATION screen, so the card is read-only here:
+          no clear (×) on either end and no swap control, and neither
+          row is pressable. The trip was chosen on the screen before
+          this one, and offering to undo it here would only invite a
+          second trip to be set up mid-confirmation.
+        */}
         <LocationCard
           pickupLabel={STRINGS.locations.pickupLabel}
           pickupValue={
@@ -68,8 +93,6 @@ const TripReadyScreen: React.FC = () => {
             dropoff ? dropoff.name : STRINGS.locations.dropoffPlaceholder
           }
           dropoffValueTone={dropoff ? 'secondary' : 'placeholder'}
-          onClearPickup={pickup ? clearPickup : undefined}
-          onClearDropoff={dropoff ? clearDropoff : undefined}
         />
 
         <AppText variant="eyebrowLarge" tone="tertiary" style={styles.sectionLabel}>
@@ -102,31 +125,15 @@ const TripReadyScreen: React.FC = () => {
             </View>
           </View>
         </AppCard>
-
-        {/* ── The two ends of the trip, as a journey ── */}
-        <AppCard radius="xl" style={styles.journeyCard}>
-          <AppText variant="caption" tone="tertiary">
-            {STRINGS.locations.pickupLabel}
-          </AppText>
-          <AppText variant="label" numberOfLines={1}>
-            {pickup ? pickup.name : STRINGS.locations.pickupPlaceholder}
-          </AppText>
-          <AppText variant="caption" tone="tertiary" style={styles.journeyGap}>
-            {STRINGS.locations.dropoffLabel}
-          </AppText>
-          <AppText variant="label" numberOfLines={1}>
-            {dropoff ? dropoff.name : STRINGS.locations.dropoffPlaceholder}
-          </AppText>
-        </AppCard>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <AppFooter>
         <AppButton
           label={STRINGS.tripReady.showRoute}
           onPress={goToRouteView}
           testID="trip-ready-next"
         />
-      </View>
+      </AppFooter>
     </AppScreen>
   );
 };
@@ -159,23 +166,6 @@ const styles = StyleSheet.create({
   summaryRight: {
     alignItems: 'flex-end',
     paddingBottom: spacing.xs,
-  },
-  journeyCard: {
-    marginTop: spacing.md,
-    padding: spacing.lg,
-    ...shadows.card,
-    borderRadius: radius.lg,
-  },
-  journeyGap: {
-    marginTop: spacing.md,
-  },
-  footer: {
-    backgroundColor: colors.background.surface,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.subtle,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xxl,
   },
 });
 

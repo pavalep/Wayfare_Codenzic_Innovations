@@ -1,5 +1,12 @@
 import React from 'react';
-import {Pressable, StyleSheet, TextInput, View, type TextInputProps} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  type TextInputProps,
+  type ViewInstance,
+} from 'react-native';
 
 import {
   colors,
@@ -39,6 +46,19 @@ export interface AppTextInputProps extends Omit<TextInputProps, 'style'> {
   onPressTrailingIcon?: () => void;
   /** Accessibility label for the trailing control. */
   trailingAccessibilityLabel?: string;
+  /**
+   * Ref to the field's white box.
+   *
+   * A form that has to scroll the focused field clear of the keyboard
+   * needs to know where that field is on screen, and only a native
+   * view can be measured — so the ref is handed straight to the box.
+   *
+   * It is the BOX and not the text inside it that the ref points at,
+   * because it is the box that has to end up above the keyboard: the
+   * text is centred inside a 54 px field, so measuring the text would
+   * leave the bottom of the field hanging under the keyboard.
+   */
+  fieldRef?: React.Ref<ViewInstance>;
   /** Test hook. */
   testID?: string;
 }
@@ -50,6 +70,7 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
   trailingIcon,
   onPressTrailingIcon,
   trailingAccessibilityLabel,
+  fieldRef,
   testID,
   onFocus,
   onBlur,
@@ -63,6 +84,7 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
     ) : null}
 
     <View
+      ref={fieldRef}
       style={[
         styles.field,
         // A field without a trailing control keeps the design's 16 px

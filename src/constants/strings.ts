@@ -37,6 +37,15 @@ export const STRINGS = {
       emailInvalid: 'Enter a valid email address',
       passwordRequired: 'Enter your password',
       passwordShort: 'Password must be at least 6 characters',
+      /**
+       * Added — the login only accepts accounts that were created on
+       * the register screen, so an email nobody registered has to be
+       * refused with a message that says where to go next.
+       */
+      unknownAccount:
+        'No account with this email. Create an account first.',
+      /** Added — the account exists but the password does not match. */
+      wrongPassword: 'That password is not right. Try again.',
     },
   },
 
@@ -82,7 +91,21 @@ export const STRINGS = {
       passwordShort: 'Password must be at least 6 characters',
       confirmRequired: 'Confirm your password',
       confirmMismatch: 'Passwords do not match',
+      /** Added — an account already exists for this email. */
+      emailTaken: 'An account with this email already exists',
     },
+    /**
+     * Added — the alert shown after a successful registration.
+     *
+     * Registering does NOT sign the user in. The account is recorded
+     * and the user is sent back to the login screen, so the message
+     * says exactly that.
+     */
+    successTitle: 'Registration successful',
+    successMessage:
+      'Your account is ready. Log in with your email and password.',
+    /** The alert's dismiss button. */
+    successAction: 'Log in',
   },
 
   locations: {
@@ -128,10 +151,39 @@ export const STRINGS = {
     useThisLocation: 'Use this location',
     /** "Tap the map to choose a point" — the map-picker before a tap. */
     tapTheMap: 'Tap the map to choose a point',
+    /**
+     * Added — the name given to a point the user dropped on the map.
+     * The map has no place names of its own, so the app names it.
+     */
+    pickedLocation: 'Picked location',
     /** Accessibility label for the swap control on the location card. */
     swapEnds: 'Swap pickup and drop-off',
     /** Accessibility label for the clear-selection control. */
     clearSelection: 'Clear selection',
+    /**
+     * Added — the alert shown when a map tap lands outside the area
+     * the app can plan a trip in.
+     */
+    outOfAreaTitle: 'Outside the service area',
+    outOfAreaMessage:
+      'Pick a point inside Doha, where the saved places are.',
+  },
+
+  /**
+   * Added — leaving the trip-planning flow ends the session.
+   *
+   * The back control on the location screen is the app's only way out
+   * of a signed-in state, so it asks before it signs the user out.
+   */
+  signOut: {
+    /** "Sign out?" */
+    title: 'Sign out?',
+    /** "You will need to log in again to plan a trip." */
+    message: 'You will need to log in again to plan a trip.',
+    /** The button that signs the user out. */
+    confirm: 'Sign out',
+    /** The button that stays signed in. */
+    cancel: 'Stay signed in',
   },
 
   tripReady: {

@@ -15,8 +15,12 @@ export const SAVED_PLACES: Place[] = [
     name: 'Home',
     address: 'Villa 12, Street 840, Zone 61 · West Bay',
     icon: 'home',
-    latitude: 25.2048,
-    longitude: 55.2708,
+    // West Bay, Doha — Zone 61 / Street 840 sits in the Al West Bay
+    // district. Every other place in this list is in Doha too, so the
+    // trip is a city journey and the drawn route stays on the city's
+    // roads.
+    latitude: 25.1858,
+    longitude: 51.5312,
   },
   {
     id: 'marina-office-tower',

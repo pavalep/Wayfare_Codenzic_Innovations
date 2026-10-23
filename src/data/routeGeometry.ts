@@ -1,4 +1,5 @@
 import type {Place} from '../types';
+import {ROAD_ROUTES, type RoadRoute} from './roadRoutes';
 
 /** A geographic point, in the shape `react-native-maps` expects. */
 export interface LatLng {
@@ -7,43 +8,116 @@ export interface LatLng {
 }
 
 /**
+ * The baked road route between two places, if there is one.
+ *
+ * The saved places are all in Doha and every ordered pair has its
+ * real road centreline baked into `roadRoutes.ts` (see
+ * `scripts/generate-road-routes.mjs` for where that data comes from).
+ * A pair that is not in the table (a custom address, or a point the
+ * user dropped on the map) has no baked route, and the drawn route
+ * falls back to a straight line between the two endpoints.
+ */
+export function getRoadRoute(
+  pickup: Place,
+  dropoff: Place,
+): RoadRoute | undefined {
+  return ROAD_ROUTES[`${pickup.id}>${dropoff.id}`];
+}
+
+/**
  * Builds the drawn route between two places.
  *
- * There is no routing engine in this build, so the polyline is
- * synthesised from the two endpoints. The shape deliberately mimics
- * the Figma route — out along the bottom, up through the middle, then
- * away on the diagonal — so the map reads like the design instead of
- * like a straight line between two pins.
+ * The polyline is the REAL road centreline for the pair, taken from
+ * the baked routing data. It follows the streets instead of cutting
+ * across the block, and it never crosses the bay.
  *
- * Swapping this for a real routing API means replacing the body of
- * this function with a call that returns the provider's polyline;
+ * Swapping this for a live routing API means replacing the body of
+ * `getRoadRoute` with a call that returns the provider's polyline;
  * nothing else in the app changes.
  */
 export function buildRouteCoordinates(pickup: Place, dropoff: Place): LatLng[] {
-  const start = {latitude: pickup.latitude ?? 25.2048, longitude: pickup.longitude ?? 55.2708};
-  const end = {latitude: dropoff.latitude ?? 25.2836, longitude: dropoff.longitude ?? 51.5042};
+  const start = {
+    latitude: pickup.latitude ?? 25.1858,
+    longitude: pickup.longitude ?? 51.5312,
+  };
+  const end = {
+    latitude: dropoff.latitude ?? 25.2836,
+    longitude: dropoff.longitude ?? 51.5042,
+  };
 
-  const midLongitude = (start.longitude + end.longitude) / 2;
-  const midLatitude = (start.latitude + end.latitude) / 2;
+  const roadRoute = getRoadRoute(pickup, dropoff);
 
-  return [
-    start,
-    {latitude: start.latitude, longitude: midLongitude},
-    {latitude: midLatitude, longitude: midLongitude},
-    {latitude: midLatitude, longitude: end.longitude},
-    end,
-  ];
+  if (roadRoute) {
+    const points = roadRoute.points.map(([latitude, longitude]) => ({
+      latitude,
+      longitude,
+    }));
+
+    /*
+     * The baked route begins and ends at the nearest point ON THE
+     * ROAD, which is a few metres from the place itself — a road is
+     * never in the middle of a building. The drawn line has to meet
+     * the markers, so its two ends are pinned to the places and only
+     * the middle keeps the road's own shape.
+     */
+    return [start, ...points.slice(1, -1), end];
+  }
+
+  return [start, end];
+}
+
+/**
+ * How the camera frames a route.
+ */
+export interface RouteRegionOptions {
+  /** The map's own width, in pixels. */
+  mapWidth: number;
+  /** The map's own height, in pixels. */
+  mapHeight: number;
+  /**
+   * Where the route's middle sits, as a fraction of the map's height.
+   *
+   * The map fills the whole screen and the sheet floats over the
+   * bottom of it, so the route has to sit in the band of screen
+   * between the top of the screen and the top of the sheet. This is
+   * the middle of that band.
+   */
+  anchorRatio: number;
+  /**
+   * How tall that band is, as a fraction of the map's height — but
+   * measured against the sheet's RESTING height, not the current one.
+   *
+   * The route is sized once, against the resting band, and then only
+   * moved up and down as the sheet is dragged. Resizing the route
+   * every time the sheet moves would zoom the camera on every drag.
+   */
+  bandRatio: number;
+  /**
+   * Where the route's middle sits across the map, as a fraction of the
+   * map's width.
+   *
+   * The traffic chip floats over the bottom left of the map, so the
+   * route is pushed to the right of it — which is where the Figma
+   * draws the route too, diagonally across the right of the map.
+   */
+  horizontalAnchorRatio?: number;
 }
 
 /**
  * The camera region that frames a route.
  *
- * The padding keeps the pins clear of the sheet that covers the
- * bottom third of the map.
+ * The route is not centred in the map: the sheet covers the bottom of
+ * the screen, so a centred route would be half hidden behind it. The
+ * region is therefore built around the band of screen that the sheet
+ * leaves visible.
+ *
+ * The route's height is sized against that band, and its middle is
+ * then moved to the middle of the band with `anchorRatio`.
  */
 export function buildRouteRegion(
   pickup: Place,
   dropoff: Place,
+  options: RouteRegionOptions,
 ): {
   latitude: number;
   longitude: number;
@@ -59,15 +133,81 @@ export function buildRouteRegion(
   const minLongitude = Math.min(...longitudes);
   const maxLongitude = Math.max(...longitudes);
 
+  const latitudeSpan = Math.max(maxLatitude - minLatitude, 0.002);
+  const longitudeSpan = Math.max(maxLongitude - minLongitude, 0.002);
+
+  /**
+   * How much of the band the route's height fills.
+   */
+  const fill = ROUTE_BAND_FILL;
+
+  /**
+   * The latitude range the camera has to show for the route to fill
+   * that much of the band.
+   */
+  const latitudeDelta = latitudeSpan / (fill * options.bandRatio);
+
+  /**
+   * The camera shows the map's own shape, so the longitude range
+   * follows from the latitude range and the map's aspect — unless
+   * that would cut the route's width off.
+   */
+  const longitudeDelta = Math.max(
+    latitudeDelta * (options.mapWidth / options.mapHeight),
+    longitudeSpan / fill,
+  );
+
+  /**
+   * How much of the map's width the route itself takes up.
+   */
+  const routeWidthFraction = longitudeSpan / longitudeDelta;
+
+  /**
+   * Where the route's middle sits across the map.
+   *
+   * It is pushed to the right of the traffic chip, but never so far
+   * that the route would run off the edge of the map.
+   */
+  const horizontalAnchor = Math.min(
+    options.horizontalAnchorRatio ?? DEFAULT_HORIZONTAL_ANCHOR,
+    1 - ROUTE_EDGE_MARGIN - routeWidthFraction / 2,
+  );
+
   return {
-    latitude: (minLatitude + maxLatitude) / 2,
-    longitude: (minLongitude + maxLongitude) / 2,
-    // 30 % padding around the bounding box so the route never touches
-    // the edge of the visible map.
-    latitudeDelta: Math.max((maxLatitude - minLatitude) * 1.3, 0.02),
-    longitudeDelta: Math.max((maxLongitude - minLongitude) * 1.3, 0.02),
+    /**
+     * The route's middle is moved to the middle of the band by
+     * pushing the camera's centre the same distance the other way.
+     */
+    latitude:
+      (minLatitude + maxLatitude) / 2 -
+      (0.5 - options.anchorRatio) * latitudeDelta,
+    longitude:
+      (minLongitude + maxLongitude) / 2 -
+      (horizontalAnchor - 0.5) * longitudeDelta,
+    latitudeDelta,
+    longitudeDelta,
   };
 }
+
+/**
+ * Where the route sits across the map, as a fraction of its width.
+ *
+ * Clear of the traffic chip, which floats over the bottom left.
+ */
+const DEFAULT_HORIZONTAL_ANCHOR = 0.62;
+
+/**
+ * The margin left between the route and the edge of the map.
+ */
+const ROUTE_EDGE_MARGIN = 0.04;
+
+/**
+ * How much of the band above the sheet the route's height fills.
+ *
+ * The rest of the band is the margin that keeps the two markers off
+ * the edge of the visible map.
+ */
+const ROUTE_BAND_FILL = 0.8;
 
 // ─── Flat-map projection ──────────────────────────────────────
 
@@ -139,4 +279,3 @@ export function projectCoordinate(
 
   return {x, y};
 }
-

@@ -46,18 +46,66 @@ describe('buildRouteCoordinates', () => {
 });
 
 describe('buildRouteRegion', () => {
-  it('centres the camera on the route and pads it', () => {
-    const pickup = SAVED_PLACES[0];
-    const dropoff = SAVED_PLACES[1];
-    const region = buildRouteRegion(pickup, dropoff);
+  /**
+   * The map is a phone screen and the sheet leaves the top 37 % of it
+   * visible at the sheet's resting height.
+   */
+  const options = {
+    mapWidth: 1080,
+    mapHeight: 2400,
+    anchorRatio: 0.185,
+    bandRatio: 0.37,
+  };
+
+  const pickup = SAVED_PLACES[0];
+  const dropoff = SAVED_PLACES[1];
+
+  it('frames the route inside the band above the sheet', () => {
+    const region = buildRouteRegion(pickup, dropoff, options);
 
     expect(region.latitudeDelta).toBeGreaterThan(0);
     expect(region.longitudeDelta).toBeGreaterThan(0);
-    expect(region.latitude).toBeGreaterThan(
-      Math.min(pickup.latitude!, dropoff.latitude!),
+
+    /**
+     * Both ends of the route have to be inside what the camera shows,
+     * or a marker ends up off the map.
+     */
+    expect(region.latitudeDelta).toBeGreaterThan(
+      Math.abs(dropoff.latitude! - pickup.latitude!),
     );
-    expect(region.latitude).toBeLessThan(
-      Math.max(pickup.latitude!, dropoff.latitude!),
+    expect(region.longitudeDelta).toBeGreaterThan(
+      Math.abs(dropoff.longitude! - pickup.longitude!),
     );
+  });
+
+  it('moves the route up the screen when the band moves up', () => {
+    const low = buildRouteRegion(pickup, dropoff, {
+      ...options,
+      anchorRatio: 0.1,
+    });
+    const high = buildRouteRegion(pickup, dropoff, {
+      ...options,
+      anchorRatio: 0.4,
+    });
+
+    /**
+     * A lower anchor puts the camera further south, so the route sits
+     * higher up the screen.
+     */
+    expect(low.latitude).toBeLessThan(high.latitude);
+  });
+
+  it('keeps the route the same size whichever band it is anchored to', () => {
+    const low = buildRouteRegion(pickup, dropoff, {
+      ...options,
+      anchorRatio: 0.1,
+    });
+    const high = buildRouteRegion(pickup, dropoff, {
+      ...options,
+      anchorRatio: 0.4,
+    });
+
+    expect(low.latitudeDelta).toBe(high.latitudeDelta);
+    expect(low.longitudeDelta).toBe(high.longitudeDelta);
   });
 });

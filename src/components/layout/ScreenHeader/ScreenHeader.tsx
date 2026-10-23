@@ -11,8 +11,10 @@ import {AppText} from '../../core/AppText';
  * From the Figma source:
  *
  *   • 88 px tall, white surface, 1 px `#E6EBEF` bottom hairline
- *   • a 40 px back button whose 18 px chevron sits 16 px from the
- *     left edge of the screen
+ *   • a 40 px back button holding the design's own 40 px chevron
+ *     (Figma node #1:93) — the glyph is a 6 × 12 px stroke, so it
+ *     is drawn at its natural size and NOT scaled down into a
+ *     smaller box, which would shrink the stroke with it
  *   • the title block starts 8 px after the back button and holds an
  *     ExtraBold 26 px title with a Regular 15 px subtitle under it
  */
@@ -39,7 +41,7 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
           onPress={onBack}
           hitSlop={8}
           style={styles.backButton}>
-          <AppIcon name="back" size={18} color={colors.text.primary} />
+          <AppIcon name="back" color={colors.text.primary} />
         </Pressable>
       ) : null}
 
