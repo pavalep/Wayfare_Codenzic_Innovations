@@ -229,6 +229,93 @@ function restoreLocalMachineSettings() {
 }
 
 /**
+ * Turns R8 (minification) OFF for the build.
+ *
+ * WHY THIS IS NEEDED
+ *
+ * With `android.enableMinifyInReleaseBuilds=true` the release APK
+ * crashes on launch, before the first Activity is created:
+ *
+ *   java.lang.RuntimeException: Unable to get provider
+ *   androidx.startup.InitializationProvider
+ *   Caused by: java.lang.RuntimeException: Failed to create an instance of
+ *   class androidx.work.impl.WorkDatabase.canonicalName
+ *
+ * `androidx.startup`'s InitializationProvider runs `WorkManagerInitializer`
+ * from `androidx.work:work-runtime:2.9.1` — pulled in by
+ * `react-native-maps` — before the app starts. WorkManager resolves its
+ * Room database implementation *by name*, so R8 renames or removes the
+ * class and the provider cannot instantiate it. The consumer rules inside
+ * the WorkManager AAR keep only the Worker classes, not the Room
+ * database, so the gap has to be closed by the application.
+ *
+ * The keep rules that close it are already written and ready in
+ * `android/app/proguard-rules.pro` (and re-applied by the
+ * `withProguardRules` plugin in `app.config.ts`). They are simply not
+ * used while R8 is off.
+ *
+ * WHY IT HAS TO BE RE-APPLIED HERE
+ *
+ * `expo prebuild` regenerates `android/gradle.properties` from the Expo
+ * template, which sets the flag back to `true`. Without this function a
+ * prebuild would silently re-enable R8 and produce the crashing APK
+ * again, so the setting is enforced on every build.
+ *
+ * The value is deliberately NOT committed as `true` in a different
+ * place: the committed `gradle.properties` says `false` and documents
+ * why, and this function makes sure the file on disk agrees with it.
+ */
+function restoreMinifySetting() {
+  const gradlePropertiesPath = join(ANDROID_DIR, 'gradle.properties');
+  const gradleProperties = readFileSync(gradlePropertiesPath, 'utf8');
+
+  const settingLine = /^android\.enableMinifyInReleaseBuilds=.*$/m;
+  const existing = gradleProperties.match(settingLine);
+
+  if (existing && existing[0].endsWith('=false')) {
+    return;
+  }
+
+  /**
+   * The replacement block. The explanation lives here rather than only
+   * in the committed file so that a regenerated `gradle.properties` ends
+   * up just as well documented as the committed one.
+   */
+  const block = [
+    'android.enableMinifyInReleaseBuilds=false',
+    '#',
+    '# R8 is OFF for the hand-over build. With minification enabled the',
+    '# release APK crashes on launch: androidx.startup runs',
+    '# WorkManagerInitializer (androidx.work:work-runtime:2.9.1, pulled in',
+    '# by react-native-maps) before the first Activity, and WorkManager',
+    '# resolves its Room database implementation BY NAME — so R8 removes or',
+    '# renames it and the provider fails to instantiate it.',
+    '#',
+    '# The keep rules that fix it are already in android/app/proguard-rules.pro',
+    '# and are re-applied by the withProguardRules plugin in app.config.ts.',
+    '# They are unused while R8 is off; set the flag back to true to use them.',
+  ].join('\n');
+
+  if (existing) {
+    writeFileSync(
+      gradlePropertiesPath,
+      gradleProperties.replace(settingLine, block),
+    );
+
+    console.log('\nDisabled R8 (android.enableMinifyInReleaseBuilds=false).');
+  } else {
+    writeFileSync(
+      gradlePropertiesPath,
+      `${gradleProperties.trimEnd()}\n\n${block}\n`,
+    );
+
+    console.log(
+      '\nDisabled R8 (added android.enableMinifyInReleaseBuilds=false).',
+    );
+  }
+}
+
+/**
  * Makes sure the Maps key resource exists.
  *
  * The prebuild writes it, but the build can be asked to reuse an
@@ -312,12 +399,18 @@ if (!skipPrebuild) {
 // ── Step 2 — hand the project to Gradle ──
 
 restoreLocalMachineSettings();
+restoreMinifySetting();
 restoreMapsKeyResource();
 
 const gradlew = process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
 const gradleTask = variant === 'release' ? 'assembleRelease' : 'assembleDebug';
 
-run(gradlew, [gradleTask, '--console=plain'], ANDROID_DIR, signingEnvironment());
+run(
+  gradlew,
+  [gradleTask, '--console=plain', `-PreactNativeArchitectures=${abis.join(',')}`],
+  ANDROID_DIR,
+  signingEnvironment(),
+);
 
 // ── Step 3 — find the APK and copy it somewhere obvious ──
 
